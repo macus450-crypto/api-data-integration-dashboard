@@ -1,5 +1,6 @@
 from flask import Flask
 from database.db import test_connection
+from services.api_client import fetch_products
 
 app = Flask(__name__)
 
@@ -17,6 +18,15 @@ def db_test():
         return result["message"], 200
 
     return result["message"], 500
+
+@app.route("/sync-preview")
+def sync_preview():
+    products = fetch_products()
+
+    return {
+        "Total products": len(products),
+        "Products": products[:5]
+    }
 
 
 if __name__ == "__main__":
