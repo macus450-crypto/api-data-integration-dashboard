@@ -24,8 +24,8 @@ def sync_preview():
     products = fetch_products()
 
     return {
-        "Total products": len(products),
-        "Products": products[:5]
+        "products_count": len(products),
+        "sample_products": products[:5]
     }
 
 
