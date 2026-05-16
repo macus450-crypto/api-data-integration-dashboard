@@ -1,3 +1,5 @@
+from os import error
+
 import psycopg2
 from config import DB_CONFIG
 
@@ -94,3 +96,92 @@ def save_product(product):
             cursor.close()
         if connection:
             connection.close()
+
+def save_sync_log(status, message, records_imported):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        query = """
+            INSERT INTO sync_logs (
+                status,
+                message,
+                records_imported
+            )
+            VALUES (%s, %s, %s);
+        """
+
+        values = (
+            status,
+            message,
+            records_imported
+        )
+
+        cursor.execute(query, values)
+        connection.commit()
+
+        return {
+            "success": True,
+            "message": "Sync log saved successfully"
+        }
+
+    except Exception as error:
+        if connection:
+            connection.rollback()
+
+        return {
+            "success": False,
+            "message": f"Failed to save sync log: {error}"
+        }
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+def get_last_sync_log():
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        query = """
+            SELECT status, message, records_imported, created_at
+            FROM sync_logs
+            ORDER BY created_at DESC
+            LIMIT 1;
+        """
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        if row is None:
+            return None
+
+        return {
+            "status": row[0],
+            "message": row[1],
+            "records_imported": row[2],
+            "created_at": row[3]
+        }
+
+    except Exception as error:
+        return {
+            "status": "error",
+            "message": f"Failed to fetch last sync log: {error}",
+            "records_imported": 0,
+            "created_at": None
+        }
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
