@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Data Dashboard</title>
+</head>
+<body>
+    <h1>Product Data Dashboard</h1>
+
+    {% if stats.error %}
+        <p>{{ stats.error }}</p>
+    {% endif %}
+
+    <h2>Dashboard statistics</h2>
+
+    <ul>
+        <li>Total products: {{ stats.total_products }}</li>
+        <li>Categories: {{ stats.categories_count }}</li>
+        <li>Average price: {{ stats.average_price }}</li>
+        <li>Low stock products: {{ stats.low_stock_products }}</li>
+    </ul>
+
+    <h2>Last synchronization</h2>
+
+    {% if stats.last_sync %}
+        <ul>
+            <li>Status: {{ stats.last_sync.status }}</li>
+            <li>Message: {{ stats.last_sync.message }}</li>
+            <li>Records imported: {{ stats.last_sync.records_imported }}</li>
+            <li>Date: {{ stats.last_sync.created_at }}</li>
+        </ul>
+    {% else %}
+        <p>No synchronization logs yet.</p>
+    {% endif %}
+</body>
+</html>
