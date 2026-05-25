@@ -1,5 +1,3 @@
-from os import error
-
 import psycopg2
 from config import DB_CONFIG
 
@@ -253,7 +251,7 @@ def get_dashboard_stats():
             connection.close()
 
 
-def get_products():
+def get_products(search=None, category=None):
     connection = None
     cursor = None
 
@@ -261,14 +259,33 @@ def get_products():
         connection = get_connection()
         cursor = connection.cursor()
 
+        conditions = []
+        parameters = []
+
         query = """
             SELECT title, brand, category, price, discount_percentage, rating, stock
             FROM products
-            ORDER BY title ASC;
-
         """
 
-        cursor.execute(query)
+        if search:
+            conditions.append("(title ILIKE %s OR brand ILIKE %s OR category ILIKE %s)")
+            
+            search_value = f"%{search}%"
+            
+            parameters.extend([search_value, search_value, search_value])
+        
+        if category:
+            conditions.append("(category = %s)")
+            
+            parameters.append(category)
+
+        if conditions:
+            query += "WHERE " + " AND ".join(conditions)
+        
+        query += " ORDER BY title ASC;"
+
+        cursor.execute(query, parameters)
+
         rows = cursor.fetchall()
 
         products = []
@@ -283,7 +300,7 @@ def get_products():
                 "rating": row[5],
                 "stock": row[6]
             }
-            
+
             products.append(product)
         
         return products
@@ -293,6 +310,44 @@ def get_products():
     
         return []
         
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+def get_categories():
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        query = """
+        SELECT DISTINCT category
+        FROM products
+        WHERE category IS NOT NULL
+        ORDER BY category ASC;
+        """
+
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+        categories_list = []
+
+        for row in rows:
+            categories_list.append(row[0])
+
+        return categories_list
+
+    
+    except Exception as error:
+        
+        print(f"Failed to get categories: {error}")
+        
+        return []
+    
     finally:
         if cursor:
             cursor.close()

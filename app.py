@@ -1,5 +1,5 @@
-from flask import Flask, render_template
-from database.db import test_connection, save_product, save_sync_log, get_dashboard_stats, get_products
+from flask import Flask, render_template, request
+from database.db import test_connection, save_product, save_sync_log, get_dashboard_stats, get_products, get_categories
 from services.api_client import fetch_products
 
 app = Flask(__name__)
@@ -65,8 +65,12 @@ def sync_products():
 
 @app.route("/products")
 def products():
-    products_list = get_products()
-    return render_template("products.html", products=products_list)
+    search = request.args.get("search")
+    category = request.args.get("category")
+    
+    categories = get_categories()
+    products_list = get_products(search=search, category=category)
+    return render_template("products.html", products=products_list, search=search, category=category, categories=categories)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -11,6 +11,33 @@
         <a href="/">Back to dashboard</a>
     </p>
 
+    <form method="GET" action="/products">
+    <input 
+        type="text" 
+        name="search" 
+        placeholder="Search by title, brand or category"
+        value="{{ search or '' }}"
+    >
+
+    <select name="category">
+        <option value="">All categories</option>
+
+        {% for item in categories %}
+            <option value="{{ item }}" {% if item == category %}selected{% endif %}>
+                {{ item }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Search</button>
+
+    {% if search or category %}
+        <a href="/products">Clear</a>
+    {% endif %}
+
+    </form>
+    </form>
+
     {% if products %}
         <table border="1">
             <thead>
