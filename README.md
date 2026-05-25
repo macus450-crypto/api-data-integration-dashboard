@@ -1,50 +1,56 @@
 # API Data Integration Dashboard
 
-A Flask and PostgreSQL project built around a realistic data integration workflow: fetch product data from an external API, normalize it, store it locally, and track synchronization history.
-
-The goal was to practice the kind of backend workflow that actually shows up in business applications — not just "display data from an API", but the full cycle: communication with an external service, transforming raw JSON into a controlled internal format, preventing duplicates across repeated runs, and logging what happened so the process is observable.
+A Flask and PostgreSQL project built around a realistic data integration workflow: fetching product data from an external API, normalizing it, storing it locally, and displaying it through a basic server-rendered dashboard.
 
 ---
 
 ## Project Status
 
-**Stage:** backend/data integration MVP — working and testable locally.
+**Stage:** local backend/data integration MVP with a basic dashboard UI — working and testable locally.
 
-The core synchronization workflow is implemented and running. The next layer — dashboard templates, product list UI, and frontend styling — is prepared as placeholder files and will be implemented next.
+The core synchronization workflow is implemented. The project includes a Jinja2 dashboard with product statistics, last synchronization info, and a product list with search and category filtering.
 
-### Implemented
+The next stage is frontend structure, styling, pagination and sorting, automated tests, architecture docs, and deployment.
+
+---
+
+## Implemented
 
 - Flask application structure and route setup
-- PostgreSQL configuration via environment variables (`python-dotenv`)
+- PostgreSQL configuration via environment variables using `python-dotenv`
 - PostgreSQL connection test route
-- Integration with DummyJSON Products API
+- Integration with the DummyJSON Products API
 - Product data normalization from raw API response
 - PostgreSQL schema for products and synchronization logs
 - Upsert logic using `ON CONFLICT (external_id) DO UPDATE`
 - Manual synchronization endpoint
 - Synchronization logging for both success and failure states
-- Database helper for fetching the latest synchronization log
-- Preview endpoint for inspecting normalized API data before saving
+- Dashboard statistics: total products, number of categories, average price, low-stock count
+- Latest synchronization status on the dashboard
+- Product list page rendered with Jinja2
+- Product search by title, brand, or category
+- Category filter populated from PostgreSQL
+- Preview endpoint for inspecting normalized data before saving
 - `requirements.txt` and `.env.example` for local setup
 
-### In Progress / Planned
+---
 
-- Dashboard UI with product statistics
-- Product list page with Jinja2 templates
-- Search by product title
-- Category filtering
-- Frontend styling
+## In Progress / Planned
+
+- Shared base layout using `base.html`
+- Frontend styling in `static/style.css`
+- Pagination and sorting for the product list
+- Charts for category distribution, price ranges, or stock levels
 - Unit tests for normalization and database logic
-- Architecture documentation
-- Docker and deployment configuration
+- Architecture documentation in `docs/architecture.md`
+- Docker support and deployment configuration
+- Scheduled synchronization
 
 ---
 
 ## Why This Project
 
-I wanted to build something that goes beyond the typical "call an API, render the response" tutorial pattern.
-
-Most business applications that deal with external data need to do more: import it on a schedule, transform it into their own internal format, avoid re-inserting the same records, and know whether the last import actually worked. This project is a small but complete version of that workflow.
+I wanted to build something closer to how external data integration actually works in backend applications — not just fetch-and-display, but import, normalize, deduplicate, store, and make queryable. The synchronization log was also something I specifically wanted to practice, since without it you have no visibility into whether the last import worked or how many records came through.
 
 ```text
 DummyJSON Products API
@@ -61,21 +67,22 @@ Upsert by external_id
         ↓
 Synchronization log
         ↓
-Future dashboard / reporting layer
+Dashboard statistics and product list
 ```
 
 ---
 
 ## Tech Stack
 
-- **Python 3**
-- **Flask**
-- **PostgreSQL**
-- **psycopg2-binary**
-- **requests**
-- **python-dotenv**
-- **HTML / CSS** — planned for dashboard layer
-- **Git / GitHub**
+- Python 3
+- Flask
+- PostgreSQL
+- psycopg2-binary
+- requests
+- python-dotenv
+- Jinja2 templates
+- HTML / CSS (styling planned)
+- Git / GitHub
 
 ---
 
@@ -83,17 +90,17 @@ Future dashboard / reporting layer
 
 ### External API Integration
 
-The application fetches product data from the DummyJSON Products API:
+Fetches product data from the DummyJSON Products API:
 
-```
+```text
 https://dummyjson.com/products?limit=0
 ```
 
-The request is handled in `services/api_client.py` with a timeout configured, so API failures are caught at the request level and don't break the synchronization flow silently.
+Handled in `services/api_client.py` with a timeout and basic error handling. If the request fails, the function returns an empty list so the rest of the sync flow doesn't crash.
 
 ### Product Data Normalization
 
-Raw API objects contain a lot of fields the application doesn't need. The normalization step extracts only the relevant fields and maps them into a consistent internal structure:
+The raw API response contains many fields that aren't needed here. Normalization pulls out only what the local schema requires:
 
 ```python
 {
@@ -109,23 +116,33 @@ Raw API objects contain a lot of fields the application doesn't need. The normal
 }
 ```
 
-This keeps the local database decoupled from whatever the external API returns. If the API adds or changes fields, the normalization layer absorbs that — the products table stays stable.
+This keeps the local schema stable — if the upstream API adds fields, nothing breaks on this end.
 
 ### Upsert Logic
 
-The project uses `ON CONFLICT (external_id) DO UPDATE` to handle repeated synchronizations cleanly:
+Uses `ON CONFLICT (external_id) DO UPDATE` so repeated syncs are safe:
 
-- if a product doesn't exist yet — insert it,
-- if it already exists — update the relevant fields,
-- running synchronization multiple times leaves the database consistent, not full of duplicates.
+- new products are inserted,
+- existing ones are updated,
+- no duplicates accumulate.
 
 ### Synchronization Logging
 
-Every synchronization run writes a record to `sync_logs` — status, message, number of records processed, and timestamp. This makes it possible to answer basic operational questions without digging into database internals:
+Every sync writes a record to `sync_logs` with status, message, record count, and timestamp. This makes it easy to see on the dashboard whether the last import worked, and when it ran.
 
-- Did the last sync succeed?
-- How many records were imported?
-- When did it run?
+### Dashboard Statistics
+
+The homepage shows basic stats pulled from the local database:
+
+- total products
+- number of unique categories
+- average product price
+- low-stock product count
+- latest sync status
+
+### Product List, Search, and Filtering
+
+The `/products` page supports searching by title, brand, or category, filtering by category, and clearing active filters. Results are displayed in an HTML table. Layout and styling are still planned.
 
 ---
 
@@ -133,10 +150,19 @@ Every synchronization run writes a record to `sync_logs` — status, message, nu
 
 | Route | Method | Description |
 |---|---|---|
-| `/` | GET | Health check — confirms the app is running. |
+| `/` | GET | Dashboard homepage with product statistics and latest sync info. |
 | `/db-test` | GET | Tests the PostgreSQL connection. |
-| `/sync-preview` | GET | Fetches and normalizes API data, returns a sample without saving anything. |
-| `/sync` | GET | Full synchronization — fetch, normalize, upsert, log results. |
+| `/sync-preview` | GET | Fetches and normalizes API data, returns a sample without saving. |
+| `/sync` | GET | Runs full synchronization: fetch, normalize, upsert, log. |
+| `/products` | GET | Product list with optional search and category filtering. |
+
+Example filtering:
+
+```text
+/products?search=phone
+/products?category=smartphones
+/products?search=phone&category=mobile-accessories
+```
 
 ---
 
@@ -161,6 +187,8 @@ CREATE TABLE products (
 );
 ```
 
+> Note: `updated_at` is set in the application layer on every update — there is no database-level trigger for it yet.
+
 ### `sync_logs`
 
 ```sql
@@ -179,19 +207,19 @@ CREATE TABLE sync_logs (
 
 ### PostgreSQL over SQLite
 
-SQLite would have been simpler to set up, but it hides too much. I wanted to work with real constraints, proper upsert syntax, and `psycopg2` directly — without an ORM abstracting away what the queries actually do.
+SQLite would have been simpler to set up, but the point of the project was to practice PostgreSQL — connections, environment config, upsert behavior, raw SQL. SQLite would have shortcut that.
 
 ### psycopg2 over SQLAlchemy
 
-Same reasoning. At this stage, writing raw SQL and handling the cursor manually teaches more than letting an ORM generate queries. SQLAlchemy makes sense when a project grows — not as a starting point when the goal is to understand the database layer.
+I deliberately avoided an ORM here. Writing raw SQL made it easier to understand exactly what each query does, and makes the database layer straightforward to walk through in a code review. SQLAlchemy would be a reasonable next step if the project grows more complex.
 
-### Why store data locally instead of hitting the API on every request?
+### Why store data locally instead of querying the API per request?
 
-The API is fine for a demo, but the application is built around the assumption that external services are unreliable or slow. Importing data once, storing it locally, and querying the local database is a more realistic pattern for reporting tools and internal dashboards.
+External APIs can be slow, rate-limited, or temporarily unavailable. Storing data locally means the dashboard always has something to query, and the application controls its own data consistency rather than depending on a third-party response being well-formed every time.
 
 ### Why `external_id`?
 
-The local database has its own primary key (`id`). `external_id` stores the original product ID from the API and is marked `UNIQUE` — this is what makes upsert possible. Without it, there's no reliable way to detect whether a product already exists in the database.
+The local database has its own internal `id`. The `external_id` stores the original product ID from DummyJSON and is marked unique — that's what lets the upsert logic detect whether a product already exists rather than inserting a duplicate.
 
 ---
 
@@ -211,13 +239,13 @@ api-data-integration-dashboard/
 ├── services/
 │   └── api_client.py
 ├── templates/
-│   ├── base.html
-│   ├── index.html          # planned dashboard
-│   └── products.html       # planned product list
+│   ├── base.html          # planned shared layout
+│   ├── index.html         # dashboard page
+│   └── products.html      # product list, search and category filter
 ├── static/
-│   └── style.css
+│   └── style.css          # planned styling
 └── docs/
-    └── architecture.md     # planned
+    └── architecture.md    # planned
 ```
 
 ---
@@ -238,11 +266,13 @@ python -m venv venv
 ```
 
 Windows PowerShell:
+
 ```powershell
 .\venv\Scripts\Activate.ps1
 ```
 
 macOS/Linux:
+
 ```bash
 source venv/bin/activate
 ```
@@ -282,47 +312,77 @@ Available at `http://127.0.0.1:5000`.
 
 ---
 
-## Testing the Workflow Manually
+## Manual Testing Workflow
 
-Once the app is running, the full backend workflow can be tested through the browser, Postman, or curl.
+### 1. Open the dashboard
 
-**1. Check the app is running**
-```
+```http
 GET /
-→ "API Data Integration Dashboard is running!"
 ```
 
-**2. Verify the database connection**
-```
+Dashboard with product stats and last sync info.
+
+### 2. Verify the database connection
+
+```http
 GET /db-test
-→ success message with PostgreSQL connection info
 ```
 
-**3. Preview normalized data without saving**
-```
+Success message with PostgreSQL connection info.
+
+### 3. Preview normalized data without saving
+
+```http
 GET /sync-preview
-→ product count + sample normalized records
 ```
 
-**4. Run synchronization**
-```
+Product count and a sample of normalized records.
+
+### 4. Run synchronization
+
+```http
 GET /sync
-→ {"success": true, "message": "Products synchronized successfully", "records_imported": 194}
 ```
 
-**5. Verify directly in PostgreSQL**
+Expected response:
+
+```json
+{
+    "success": true,
+    "message": "Products synchronized successfully",
+    "records_imported": 194
+}
+```
+
+### 5. Open the product list
+
+```http
+GET /products
+```
+
+Product table from PostgreSQL.
+
+### 6. Test search and filtering
+
+```http
+GET /products?search=phone
+GET /products?category=smartphones
+GET /products?search=phone&category=mobile-accessories
+```
+
+### 7. Verify directly in PostgreSQL
 
 ```sql
--- Check import count
+-- Check imported product count
 SELECT COUNT(*) FROM products;
 
--- Check recent sync history
+-- Recent sync history
 SELECT status, message, records_imported, created_at
 FROM sync_logs
 ORDER BY created_at DESC
 LIMIT 5;
 
--- Products that need attention (low stock)
+-- Products low on stock
 SELECT title, brand, stock
 FROM products
 WHERE stock < 10
@@ -339,25 +399,33 @@ ORDER BY total DESC;
 
 ## Current Limitations
 
-- Local MVP only — no deployment configuration yet.
-- Template and static files are present as placeholders; the dashboard UI is not implemented yet.
-- Synchronization is triggered manually through the `/sync` endpoint.
-- Error handling covers the main failure paths but isn't exhaustive.
-- No authentication.
-- No automated tests yet.
+- Local only — no deployment yet
+- UI is functional but unstyled
+- `base.html`, `style.css`, and `docs/architecture.md` are stubs
+- Sync is triggered manually
+- `/sync` uses GET for convenience during local testing — should be POST before any deployment
+- No pagination, sorting, or charts yet
+- No automated tests
+- No authentication
 
 ---
 
 ## Roadmap
 
-**Next:**
-- Dashboard homepage with product stats (total products, categories, average price, low-stock count, last sync status)
-- Product list page with search and category filtering
-- Basic frontend styling
+### Next
 
-**Later:**
-- Pagination and sorting
-- Charts for category distribution, price ranges, stock levels
-- Unit tests for normalization and database functions
-- Docker support
+- Shared Jinja2 base layout
+- Frontend styling for dashboard and product table
+- Navigation between dashboard and product list
+- Pagination and sorting for the products page
+- `docs/architecture.md` with data flow notes
+- Screenshots after the UI is styled
+
+### Later
+
+- Charts for categories, prices, and stock
+- Unit tests for normalization and database helpers
+- Docker and deployment config
 - Scheduled synchronization
+- More advanced filtering
+- Authentication if the dashboard becomes more admin-facing
