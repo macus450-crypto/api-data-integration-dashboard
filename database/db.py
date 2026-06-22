@@ -85,10 +85,11 @@ def save_product(product):
         if connection:
             connection.rollback()
 
-            return {
-                "success": False,
-                "message": f"Failed to save product: {error}"
-            }
+        return {
+            "success": False,
+            "message": f"Failed to save product: {error}"
+        }
+    
     finally:        
         if cursor:
             cursor.close()
