@@ -438,4 +438,3 @@ FROM products;
 * `records_imported` may still be returned after repeated synchronization because the endpoint counts successful save/update operations, not only newly inserted records.
 * This test focuses on duplicate prevention and does not validate every product field against the external API.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
-
