@@ -245,7 +245,15 @@ api-data-integration-dashboard/
 ├── static/
 │   └── style.css          # planned styling
 └── docs/
-    └── architecture.md    # planned
+    ├── architecture.md    # planned
+    └── qa/
+        ├── 00-context.md
+        ├── 01-current-state-review.md
+        ├── 02-test-charter.md
+        ├── 03-test-cases.md
+        ├── 04-test-execution-log.md
+        ├── 05-bug-reports-and-observations.md
+        └── evidence/
 ```
 
 ---
@@ -394,6 +402,46 @@ FROM products
 GROUP BY category
 ORDER BY total DESC;
 ```
+
+---
+
+## Manual QA Review
+
+This project includes a local manual QA review focused on the main MVP data integration flow.
+
+The QA pass covered the following areas:
+
+* database connection
+* external API preview
+* manual product synchronization
+* dashboard statistics
+* products page
+* keyword search
+* category filtering
+* combined search and category filtering
+* empty search result behavior
+* repeated synchronization and duplicate prevention
+
+All manual test cases from TC-001 to TC-010 passed in the tested local environment.
+
+QA documentation is available in [`docs/qa`](docs/qa):
+
+* [`00-context.md`](docs/qa/00-context.md) - baseline notes and initial environment check
+* [`01-current-state-review.md`](docs/qa/01-current-state-review.md) - current state review of implemented, partial and planned features
+* [`02-test-charter.md`](docs/qa/02-test-charter.md) - scope, risks and test approach for this QA pass
+* [`03-test-cases.md`](docs/qa/03-test-cases.md) - manual test cases for the main MVP flow
+* [`04-test-execution-log.md`](docs/qa/04-test-execution-log.md) - executed test results with actual results and evidence references
+* [`05-bug-reports-and-observations.md`](docs/qa/05-bug-reports-and-observations.md) - QA observations, limitations and recommendations
+
+Evidence files are stored in [`docs/qa/evidence`](docs/qa/evidence), including screenshots and SQL verification for duplicate prevention.
+
+Main QA conclusion:
+
+The core MVP flow works as expected in the tested local environment. Products can be fetched from the external API, normalized, synchronized into PostgreSQL, displayed on the dashboard and browsed through the products page with search and category filtering.
+
+No functional bugs were found in the main tested MVP flow during this QA pass.
+
+The main recommended improvements are changing `/sync` from GET to POST, adding automated tests, improving UI styling, and adding pagination or sorting for the products table.
 
 ---
 
