@@ -79,7 +79,7 @@ def save_product(product):
 
         return {
             "success": True,
-            "message": "Product save successfully"
+            "message": "Product saved successfully"
         }
     except Exception as error:
         if connection:
@@ -259,7 +259,7 @@ def get_products(search=None, category=None):
     try:
         connection = get_connection()
         cursor = connection.cursor()
-
+        # conditions stores optional SQL filters based on user query parameters
         conditions = []
         parameters = []
 
@@ -281,7 +281,7 @@ def get_products(search=None, category=None):
             parameters.append(category)
 
         if conditions:
-            query += "WHERE " + " AND ".join(conditions)
+            query += " WHERE " + " AND ".join(conditions)
         
         query += " ORDER BY title ASC;"
 

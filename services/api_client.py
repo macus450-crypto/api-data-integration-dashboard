@@ -11,9 +11,22 @@ def fetch_products():
         data = response.json()
         products = data.get("products", [])
 
+        if not isinstance(products, list):
+            return {
+                "success": False,
+                "products": [],
+                "message": "Invalid response format: 'products' is not a list"
+            }
+
         normalized_products = []
 
         for product in products:
+            if not isinstance(product, dict):
+                continue
+
+            if product.get("id") is None or not product.get("title"):
+                continue
+            
             normalized_product = {
                 "external_id": product.get("id"),
                 "title": product.get("title"),
@@ -28,8 +41,15 @@ def fetch_products():
 
             normalized_products.append(normalized_product)
 
-        return normalized_products
+        return {
+            "success": True,
+            "products": normalized_products,
+            "message": "Products fetched successfully"
+        }
 
     except requests.exceptions.RequestException as error:
-        print(f"Error while fetching products: {error}")
-        return []
+        return {
+            "success": False,
+            "products": [],
+            "message": f"Error while fetching products: {error}"
+        }

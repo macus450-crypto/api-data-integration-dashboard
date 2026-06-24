@@ -22,16 +22,46 @@ def db_test():
 
 @app.route("/sync-preview")
 def sync_preview():
-    products = fetch_products()
+    fetch_result = fetch_products()
+    
+    if fetch_result["success"] == False:
+        return {
+            "success": False,
+            "status": "error",
+            "message": fetch_result.get("message"),
+            "products_count": 0,
+            "sample_products": []
+        }, 500
+    
+    products = fetch_result.get("products", [])
 
     return {
+        "success": True,
+        "status": "success",
+        "message": fetch_result.get("message"),
         "products_count": len(products),
         "sample_products": products[:5]
     }
 
 @app.route("/sync")
 def sync_products():
-    products = fetch_products()
+    fetch_result = fetch_products()
+    
+    if fetch_result["success"] == False:
+        save_sync_log(
+            "error",
+            fetch_result.get("message"),
+            0
+        )
+        return {
+            "success": False,
+            "status": "error",
+            "message": fetch_result.get("message"),
+            "records_imported": 0
+        }, 500
+        
+
+    products = fetch_result.get("products", [])
 
     if not products:
         save_sync_log(
@@ -41,27 +71,47 @@ def sync_products():
         )
         return {
             "success": False,
+            "status": "error",
             "message": "No products fetched from external API",
             "records_imported": 0
         }, 500
     
     imported_count = 0
+    not_imported_count = 0
     
     for product in products:
         result = save_product(product) 
         if result["success"]: 
             imported_count += 1
-
-    save_sync_log(
-        "success",
-        "Products synchronized successfully",
-        imported_count
-    )
-    return {
-        "success": True,
-        "message": "Products synchronized successfully",
-        "records_imported": imported_count
-    }
+        else:
+            not_imported_count += 1
+    
+    if not_imported_count == 0:
+        save_sync_log(
+            "success",
+            "Products synchronized successfully",
+            imported_count
+        )
+        return {
+            "success": True,
+            "status": "success",
+            "message": "Products synchronized successfully",
+            "records_imported": imported_count,
+            "records_not_imported": not_imported_count
+        }
+    else:
+        save_sync_log(
+            "partial_success",
+            f"Products synchronized with some errors. Imported: {imported_count}, Not Imported: {not_imported_count}",
+            imported_count,
+        )
+        return {
+            "success": True,
+            "status": "partial_success",
+            "message": f"Products synchronized with some errors. Imported: {imported_count}, Not Imported: {not_imported_count}",
+            "records_imported": imported_count,
+            "records_not_imported": not_imported_count
+        }
 
 @app.route("/products")
 def products():
