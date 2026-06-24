@@ -1,36 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Product Data Dashboard</title>
-</head>
-<body>
-    <h1>Product Data Dashboard</h1>
+{% extends "base.html" %}
 
-    {% if stats.error %}
-        <p>{{ stats.error }}</p>
-    {% endif %}
+{% block title %}Dashboard | API Dashboard{% endblock %}
 
-    <h2>Dashboard statistics</h2>
+{% block content %}
+<section class="page-intro dashboard-intro">
+    <div>
+        <p class="kicker">Local data integration project</p>
+        <h1>Product synchronization dashboard</h1>
+        <p class="lead">
+            A Flask and PostgreSQL application that imports product records from an external API,
+            stores normalized data, and exposes a small operational dashboard.
+        </p>
+    </div>
 
-    <ul>
-        <li>Total products: {{ stats.total_products }}</li>
-        <li>Categories: {{ stats.categories_count }}</li>
-        <li>Average price: {{ stats.average_price }}</li>
-        <li>Low stock products: {{ stats.low_stock_products }}</li>
-    </ul>
+    <div class="intro-actions" aria-label="Dashboard actions">
+        <a href="/products" class="button button-primary">Browse products</a>
+        <a href="/sync" class="button button-secondary">Run sync</a>
+    </div>
+</section>
 
-    <h2>Last synchronization</h2>
+{% if stats.error %}
+    <section class="notice notice-error" role="alert">
+        <strong>Dashboard data could not be loaded.</strong>
+        <span>{{ stats.error }}</span>
+    </section>
+{% endif %}
 
-    {% if stats.last_sync %}
-        <ul>
-            <li>Status: {{ stats.last_sync.status }}</li>
-            <li>Message: {{ stats.last_sync.message }}</li>
-            <li>Records imported: {{ stats.last_sync.records_imported }}</li>
-            <li>Date: {{ stats.last_sync.created_at }}</li>
-        </ul>
-    {% else %}
-        <p>No synchronization logs yet.</p>
-    {% endif %}
-</body>
-</html>
+<section class="metrics-grid" aria-label="Product database metrics">
+    <article class="metric-card">
+        <span class="metric-label">Total products</span>
+        <strong class="metric-value">{{ stats.total_products }}</strong>
+        <span class="metric-note">records stored locally</span>
+    </article>
+
+    <article class="metric-card">
+        <span class="metric-label">Categories</span>
+        <strong class="metric-value">{{ stats.categories_count }}</strong>
+        <span class="metric-note">distinct product groups</span>
+    </article>
+
+    <article class="metric-card">
+        <span class="metric-label">Average price</span>
+        <strong class="metric-value">${{ "%.2f"|format(stats.average_price or 0) }}</strong>
+        <span class="metric-note">calculated from PostgreSQL</span>
+    </article>
+
+    <article class="metric-card metric-card-warning">
+        <span class="metric-label">Low stock</span>
+        <strong class="metric-value">{{ stats.low_stock_products }}</strong>
+        <span class="metric-note">products below stock threshold</span>
+    </article>
+</section>
+
+<section class="dashboard-grid">
+    <article class="panel sync-card">
+        <div class="panel-heading">
+            <div>
+                <p class="kicker">Synchronization log</p>
+                <h2>Last import status</h2>
+            </div>
+
+            {% if stats.last_sync %}
+                <span class="status status-{{ stats.last_sync.status|lower|replace('_', '-') }}">
+                    {{ stats.last_sync.status|replace('_', ' ') }}
+                </span>
+            {% else %}
+                <span class="status status-neutral">No log yet</span>
+            {% endif %}
+        </div>
+
+        {% if stats.last_sync %}
+            <dl class="details-list">
+                <div>
+                    <dt>Message</dt>
+                    <dd>{{ stats.last_sync.message }}</dd>
+                </div>
+                <div>
+                    <dt>Records imported</dt>
+                    <dd>{{ stats.last_sync.records_imported }}</dd>
+                </div>
+                <div>
+                    <dt>Created at</dt>
+                    <dd>{{ stats.last_sync.created_at }}</dd>
+                </div>
+            </dl>
+        {% else %}
+            <p class="empty-text">
+                No sync recorded yet. Run sync to import the first batch.
+            </p>
+        {% endif %}
+    </article>
+
+    <aside class="panel workflow-card">
+        <p class="kicker">Data flow</p>
+        <h2>Integration workflow</h2>
+
+        <div class="flow-stack" aria-label="Application data flow">
+            <span>External API</span>
+            <span>Normalization</span>
+            <span>PostgreSQL upsert</span>
+            <span>Sync log</span>
+            <span>Dashboard view</span>
+        </div>
+
+        <p class="panel-copy">
+            The dashboard keeps the import process visible: records are fetched, normalized, upserted into PostgreSQL and logged after each synchronization.
+        </p>
+    </aside>
+</section>
+{% endblock %}

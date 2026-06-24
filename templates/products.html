@@ -1,71 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Products</title>
-</head>
-<body>
-    <h1>Products</h1>
+{% extends "base.html" %}
 
-    <p>
-        <a href="/">Back to dashboard</a>
-    </p>
+{% block title %}Products | API Dashboard{% endblock %}
 
-    <form method="GET" action="/products">
-    <input 
-        type="text" 
-        name="search" 
-        placeholder="Search by title, brand or category"
-        value="{{ search or '' }}"
-    >
+{% block content %}
+<section class="page-intro products-intro">
+    <div>
+        <p class="kicker">Stored product records</p>
+        <h1>Product catalog</h1>
+        <p class="lead">
+            Search and filter normalized product data saved in PostgreSQL after synchronization with the external API.
+        </p>
+    </div>
 
-    <select name="category">
-        <option value="">All categories</option>
+    <a href="/" class="button button-secondary">Back to dashboard</a>
+</section>
 
-        {% for item in categories %}
-            <option value="{{ item }}" {% if item == category %}selected{% endif %}>
-                {{ item }}
-            </option>
-        {% endfor %}
-    </select>
+<section class="panel filters-card" aria-label="Product filters">
+    <form method="GET" action="/products" class="filters-form">
+        <label class="form-field" for="search">
+            <span>Search products</span>
+            <input
+                id="search"
+                type="text"
+                name="search"
+                placeholder="Title, brand or category"
+                value="{{ search or '' }}"
+            >
+        </label>
 
-    <button type="submit">Search</button>
+        <label class="form-field" for="category">
+            <span>Category</span>
+            <select id="category" name="category">
+                <option value="">All categories</option>
 
-    {% if search or category %}
-        <a href="/products">Clear</a>
-    {% endif %}
+                {% for item in categories %}
+                    <option value="{{ item }}" {% if item == category %}selected{% endif %}>
+                        {{ item }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
 
+        <div class="form-actions">
+            <button type="submit" class="button button-primary">Apply</button>
+
+            {% if search or category %}
+                <a href="/products" class="button button-text">Clear</a>
+            {% endif %}
+        </div>
     </form>
+</section>
+
+<section class="panel table-card">
+    <div class="table-header">
+        <div>
+            <p class="kicker">Query result</p>
+            <h2>Products</h2>
+        </div>
+
+        <span class="result-count">
+            {{ products|length }} result{% if products|length != 1 %}s{% endif %}
+        </span>
+    </div>
 
     {% if products %}
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Brand</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Discount</th>
-                    <th>Rating</th>
-                    <th>Stock</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
+        <div class="table-scroll">
+            <table class="product-table">
+                <thead>
                     <tr>
-                        <td>{{ product.title }}</td>
-                        <td>{{ product.brand }}</td>
-                        <td>{{ product.category }}</td>
-                        <td>{{ product.price }}</td>
-                        <td>{{ product.discount_percentage }}</td>
-                        <td>{{ product.rating }}</td>
-                        <td>{{ product.stock }}</td>
+                        <th>Product</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Discount</th>
+                        <th>Rating</th>
+                        <th>Stock</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td class="product-name">{{ product.title }}</td>
+                            <td>{{ product.brand or "Unknown" }}</td>
+                            <td>
+                                <span class="category-label">{{ product.category or "uncategorized" }}</span>
+                            </td>
+                            <td class="numeric-cell">${{ "%.2f"|format(product.price or 0) }}</td>
+                            <td class="numeric-cell">{{ "%.2f"|format(product.discount_percentage or 0) }}%</td>
+                            <td class="numeric-cell rating-value">{{ "%.2f"|format(product.rating or 0) }}</td>
+                            <td>
+                                {% if product.stock is none %}
+                                    <span class="stock stock-neutral">N/A</span>
+                                {% elif product.stock < 10 %}
+                                    <span class="stock stock-low">{{ product.stock }}</span>
+                                {% else %}
+                                    <span class="stock stock-ok">{{ product.stock }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <p>No products found.</p>
+        <div class="empty-state">
+            <h3>No products found</h3>
+            <p>Try clearing the filters or run synchronization if the database is empty.</p>
+            <a href="/products" class="button button-secondary">Reset filters</a>
+        </div>
     {% endif %}
-</body>
-</html>
+</section>
+{% endblock %}

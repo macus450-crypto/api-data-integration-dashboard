@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}API Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-frame">
+        <header class="topbar">
+            <div class="container topbar-inner">
+                <a href="/" class="brand" aria-label="Product Data Integration Dashboard home">
+                    <span class="brand-mark" aria-hidden="true">PD</span>
+                    <span class="brand-text">
+                        <strong>Product Data</strong>
+                        <span>Integration Dashboard</span>
+                    </span>
+                </a>
+
+                <nav class="main-nav" aria-label="Primary navigation">
+                    <a href="/">Dashboard</a>
+                    <a href="/products">Products</a>
+                    <a href="/sync-preview">API preview</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container page-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="container footer">
+            <span>External Product API</span>
+            <span aria-hidden="true">→</span>
+            <span>Flask</span>
+            <span aria-hidden="true">→</span>
+            <span>PostgreSQL</span>
+            <span aria-hidden="true">→</span>
+            <span>Sync logs</span>
+        </footer>
+    </div>
+</body>
+</html>
