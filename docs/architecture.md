@@ -2,11 +2,11 @@
 
 ## Project purpose
 
-Product Data Integration Dashboard is a small Flask application built to practice a realistic data integration workflow.
+Product Data Integration Dashboard is a small Flask application built to practice a realistic product data integration workflow.
 
-The application fetches product data from an external API, validates and normalizes the response, stores the records in a PostgreSQL database, logs synchronization results, and presents product statistics in a simple web dashboard.
+The application fetches product data from an external API, validates and normalizes the response, stores the records in a PostgreSQL database, logs synchronization results, and presents product statistics in a styled server-rendered dashboard.
 
-The main goal of the project is not to build a large production system, but to demonstrate practical understanding of API integration, backend logic, SQL, PostgreSQL, synchronization flow, error handling and technical documentation.
+The goal is not to build a large production system. The goal is to demonstrate practical understanding of API integration, backend logic, SQL, PostgreSQL, synchronization flow, error handling, server-rendered views, and technical documentation.
 
 ---
 
@@ -19,13 +19,13 @@ DummyJSON Products API
 → services/api_client.py
 → fetch_products()
 → data validation
-→ data normalization
+→ product normalization
 → app.py /sync route
 → database/db.py save_product()
 → PostgreSQL products table
 → database/db.py save_sync_log()
 → PostgreSQL sync_logs table
-→ Flask dashboard
+→ Flask/Jinja2 dashboard
 → User
 ```
 
@@ -55,10 +55,10 @@ Main routes:
 * `/` — displays dashboard statistics and last synchronization status.
 * `/products` — displays product list with search and category filtering.
 * `/sync-preview` — fetches product data from the external API and returns a preview without saving to the database.
-* `/sync` — fetches products, saves them to PostgreSQL, and writes a synchronization log.
+* `/sync` — fetches products, saves them to PostgreSQL, writes a synchronization log, and returns a JSON response.
 * `/db-test` — checks database connection.
 
-`app.py` should coordinate the flow, not contain low-level API or SQL logic.
+`app.py` coordinates the flow between API client logic, database functions, and templates. It should not contain low-level SQL details or raw external API parsing logic.
 
 ---
 
@@ -66,7 +66,7 @@ Main routes:
 
 Contains logic responsible for communication with the external API.
 
-Main responsibility:
+Main responsibilities:
 
 * sending the HTTP request,
 * checking response status,
@@ -101,7 +101,7 @@ or, in case of an error:
 }
 ```
 
-This makes error handling in `app.py` clearer.
+This makes error handling in `app.py` clearer because the route can check `success` before trying to save products.
 
 ---
 
@@ -141,17 +141,34 @@ Contains HTML templates rendered by Flask.
 
 Main templates:
 
-* `index.html` — dashboard view.
-* `products.html` — product list view.
-* `base.html` — planned shared layout, currently not used by templates
+* `base.html` — shared layout used by the dashboard and product list templates.
+* `index.html` — dashboard view with product statistics, latest sync information, and data flow summary.
+* `products.html` — product list view with search and category filtering.
+
+The templates are server-rendered with Jinja2. This keeps the frontend simple and appropriate for the current MVP scope.
+
+---
+
+### `static/`
+
+Contains static frontend assets.
+
+Main file:
+
+* `style.css` — custom styling for the dashboard layout, product table, navigation, forms, status badges, and responsive behavior.
+
+The UI is intentionally simple and server-rendered. It is styled enough for portfolio presentation, but it is not meant to be a complex frontend application.
 
 ---
 
 ### `docs/`
 
-Contains technical documentation for the project.
+Contains technical and QA documentation for the project.
 
-This file explains how the application works internally and how data moves through the system.
+Main areas:
+
+* `architecture.md` — explains the internal structure and data flow.
+* `qa/` — contains manual QA notes, test cases, test execution log, observations, and evidence.
 
 ---
 
@@ -258,7 +275,7 @@ The critical fields are:
 * `id` — required to create `external_id`,
 * `title` — required to display a meaningful product name.
 
-Fields such as `brand`, `category`, `rating` or `thumbnail` are useful, but they are not critical for identifying the product.
+Fields such as `brand`, `category`, `rating`, or `thumbnail` are useful, but they are not critical for identifying the product.
 
 ---
 
@@ -418,6 +435,13 @@ Error response example:
 }
 ```
 
+Current behavior note:
+
+```text
+/sync currently uses GET and returns JSON.
+For deployment, it should be changed to POST and should either redirect back to the dashboard or show a user-friendly sync result page.
+```
+
 ---
 
 ## Error handling
@@ -458,7 +482,7 @@ The dashboard displays:
 * total number of products,
 * number of categories,
 * average product price,
-* number of low stock products,
+* number of low-stock products,
 * last synchronization status,
 * last synchronization message,
 * number of records imported,
@@ -534,9 +558,12 @@ Current limitations:
 
 * The application runs locally.
 * Synchronization is triggered manually through `/sync`.
+* `/sync` currently uses GET and returns JSON; it should use POST before deployment.
+* The dashboard "Run sync" action currently opens a JSON response instead of redirecting back to the dashboard.
 * There is no user authentication.
-* There is no advanced frontend design.
+* The UI is styled, but still intentionally simple and server-rendered.
 * There is no pagination for large product lists yet.
+* There is no sorting by price, rating, or stock yet.
 * Partial database save errors are counted, but detailed per-product error logs are not stored yet.
 * The project does not include automated tests yet.
 * The project is not deployed to production.
@@ -550,15 +577,16 @@ These limitations are acceptable for the current project scope because the goal 
 
 Possible future improvements:
 
+* Change `/sync` from GET to POST.
+* Redirect back to the dashboard after synchronization or show a user-friendly sync result page.
 * Add pagination to the product list.
-* Add sorting by price, rating or stock.
+* Add sorting by price, rating, or stock.
 * Store detailed error logs for failed product saves.
 * Add automated tests for API client and database functions.
-* Improve frontend styling.
 * Add charts for product statistics.
-* Add environment setup instructions to README.
 * Add deployment configuration.
-* Add more detailed validation for numeric fields such as price, rating and stock.
+* Add more detailed validation for numeric fields such as price, rating, and stock.
+* Add authentication if the dashboard becomes more admin-facing.
 
 ---
 
@@ -577,7 +605,7 @@ External API
 
 The project demonstrates practical junior-level backend skills:
 
-* working with external REST API,
+* working with an external REST API,
 * parsing JSON,
 * validating uncertain external data,
 * normalizing data into an internal structure,
@@ -585,4 +613,5 @@ The project demonstrates practical junior-level backend skills:
 * preventing duplicates with `external_id`,
 * using SQL queries for statistics and filtering,
 * handling basic errors,
+* rendering database data through Jinja2 templates,
 * documenting architecture and decisions.
