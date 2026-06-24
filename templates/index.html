@@ -81,7 +81,13 @@
                 </div>
                 <div>
                     <dt>Created at</dt>
-                    <dd>{{ stats.last_sync.created_at }}</dd>
+                    <dd>
+                        {% if stats.last_sync.created_at %}
+                            {{ stats.last_sync.created_at.strftime("%Y-%m-%d %H:%M") }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </dd>
                 </div>
             </dl>
         {% else %}
