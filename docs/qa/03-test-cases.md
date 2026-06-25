@@ -6,6 +6,12 @@ This document contains manual test cases for the main MVP data integration flow 
 
 The test cases focus on local manual testing of implemented and testable features: database connection, external API preview, synchronization, dashboard, products page, search, category filtering and repeated synchronization.
 
+## Execution note
+
+This file contains the designed manual test cases.
+
+Actual results, execution statuses and evidence from the completed manual test run are documented separately in `04-test-execution-log.md`.
+
 ---
 
 ## TC-001 - Database connection check
@@ -26,14 +32,6 @@ The test cases focus on local manual testing of implemented and testable feature
 * Endpoint returns a successful response.
 * Response confirms that the application is connected to PostgreSQL.
 * No server error is displayed.
-
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
 
 **Notes:**
 
@@ -63,17 +61,12 @@ The test cases focus on local manual testing of implemented and testable feature
 * Sample products include normalized fields such as `external_id`, `title`, `brand`, `category`, `price`, `rating`, `stock` and `thumbnail_url`.
 * Data is previewed without saving products to the database.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
-* This test checks API fetch and normalization preview only. Database saving is covered by a separate synchronization test.
+* This test checks API fetch and normalization preview only.
+* Database saving is covered by a separate synchronization test.
+
+---
 
 ## TC-003 - Manual product synchronization
 
@@ -102,14 +95,6 @@ The test cases focus on local manual testing of implemented and testable feature
 * Products are saved or updated in PostgreSQL.
 * Dashboard displays latest synchronization status after running `/sync`.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
 * This test verifies the main manual synchronization flow.
@@ -121,17 +106,20 @@ The test cases focus on local manual testing of implemented and testable feature
 ## TC-004 - Dashboard displays product statistics after synchronization
 
 **Preconditions:**
+
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
 * Products have been synchronized by running `/sync`.
 
 **Steps:**
+
 1. Open `http://127.0.0.1:5000/` in the browser.
 2. Check the dashboard statistics section.
 3. Check the latest synchronization section.
 
 **Expected result:**
+
 * Dashboard page loads without a server error.
 * Dashboard displays total products count.
 * Dashboard displays categories count.
@@ -140,15 +128,12 @@ The test cases focus on local manual testing of implemented and testable feature
 * Dashboard displays latest synchronization status.
 * Latest synchronization section contains status, message, records imported and date.
 
-**Actual result:**
-* To be filled during test execution.
-
-**Status:**
-* Not run
-
 **Notes:**
+
 * This test verifies whether synchronized database data is visible on the dashboard.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
+
+---
 
 ## TC-005 - Products page displays product records
 
@@ -175,20 +160,14 @@ The test cases focus on local manual testing of implemented and testable feature
 * Product details are displayed in the expected columns.
 * Search input and category filter are visible on the page.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
 * This test verifies whether synchronized product data is visible on the products page.
 * This test does not validate every database record against the UI.
 * Direct database count or record validation should be covered by a separate SQL/data consistency test.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
+
+---
 
 ## TC-006 - Product search by keyword
 
@@ -221,14 +200,6 @@ The test cases focus on local manual testing of implemented and testable feature
 * `Clear` link is visible when search is active.
 * After clicking `Clear`, active search is removed and the products page displays the unfiltered product list again.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
 * This test verifies keyword search on the products page.
@@ -236,6 +207,8 @@ The test cases focus on local manual testing of implemented and testable feature
 * This test does not validate every database record against the UI.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
 * This test does not cover combined search and category filtering, which should be covered by a separate test case.
+
+---
 
 ## TC-007 - Category filter displays selected category products
 
@@ -268,14 +241,6 @@ The test cases focus on local manual testing of implemented and testable feature
 * `Clear` link is visible when category filter is active.
 * After clicking `Clear`, active category filter is removed and the products page displays the unfiltered product list again.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
 * This test verifies category filtering on the products page.
@@ -283,6 +248,8 @@ The test cases focus on local manual testing of implemented and testable feature
 * This test does not validate every database record against the UI.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
 * This test does not cover combined search and category filtering, which should be covered by a separate test case.
+
+---
 
 ## TC-008 - Combined search and category filtering
 
@@ -321,14 +288,6 @@ The test cases focus on local manual testing of implemented and testable feature
 * `Clear` link is visible when both search and category filters are active.
 * After clicking `Clear`, all active filters are removed and the products page displays the unfiltered product list again.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
 * This test verifies combined keyword search and category filtering on the products page.
@@ -336,6 +295,8 @@ The test cases focus on local manual testing of implemented and testable feature
 * This test checks whether both filters work together, not only separately.
 * This test does not validate every database record against the UI.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
+
+---
 
 ## TC-009 - Empty search result behavior
 
@@ -369,14 +330,6 @@ The test cases focus on local manual testing of implemented and testable feature
 * `Clear` link is visible when search is active.
 * After clicking `Clear`, active search is removed and the products page displays the unfiltered product list again.
 
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
-
 **Notes:**
 
 * This test verifies the behavior of the products page when a search query returns no matching results.
@@ -384,6 +337,8 @@ The test cases focus on local manual testing of implemented and testable feature
 * If no empty-state message is displayed, this should be documented later as a UX observation or failed expectation, depending on the final behavior.
 * This test does not validate every database record against the UI.
 * This test does not validate visual styling because the UI is still basic and styling is planned.
+
+---
 
 ## TC-010 - Repeated synchronization does not create duplicate products
 
@@ -422,14 +377,6 @@ FROM products;
 * Each product is represented by a unique `external_id`.
 * `COUNT(*)` and `COUNT(DISTINCT external_id)` return the same value.
 * No duplicate product records are created in the main tested scenario.
-
-**Actual result:**
-
-* To be filled during test execution.
-
-**Status:**
-
-* Not run
 
 **Notes:**
 
