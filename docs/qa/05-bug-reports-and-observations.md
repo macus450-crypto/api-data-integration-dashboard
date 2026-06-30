@@ -53,23 +53,23 @@ Resolved. `/sync` uses POST, redirects back to the dashboard, and shows the resu
 
 ---
 
-### OBS-002 - UI is functional but visually unstyled
+### OBS-002 - Basic UI styling has been added
 
-**Type:** UX / UI limitation  
-**Severity:** Low  
-**Priority:** Low
+**Type:** Resolved UX / UI observation
+**Severity:** Resolved
+**Priority:** Resolved
 
 **Description:**
 
-The dashboard and products page are functional, but the visual layer is very basic. The pages use simple HTML elements and default browser styling.
+The dashboard and products page now use custom CSS for layout, cards, tables, filters, buttons, status badges, empty states and responsive behavior.
 
 **Why it matters:**
 
-The application is usable for local MVP testing, but a more polished layout would improve readability, usability and professional presentation.
+A styled interface improves readability, usability and professional presentation for a portfolio project.
 
-**Recommendation:**
+**Current status:**
 
-Add basic styling for dashboard statistics, product table, forms, buttons and empty states.
+Resolved. Future UI work should focus on feature polish, visual regression checks and refreshed screenshots after larger changes.
 
 ---
 

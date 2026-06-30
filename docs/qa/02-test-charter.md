@@ -51,7 +51,7 @@ The main risks for this QA pass are:
 * The project requires a correctly configured local PostgreSQL database.
 * The synchronization flow depends on the `/sync` POST action, redirect back to the dashboard, and flash message display.
 * External API or database error states may need targeted checks beyond the happy path.
-* Product list UI is functional but still unstyled.
+* UI styling is present, but screenshots should be refreshed after UI or sync-flow changes.
 * There are no automated regression tests yet.
 * Repeated manual checks may be needed after changes because the project has no test automation at this stage.
 

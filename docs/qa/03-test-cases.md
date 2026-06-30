@@ -133,7 +133,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 **Notes:**
 
 * This test verifies whether synchronized database data is visible on the dashboard.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.
 
 ---
 
@@ -167,7 +167,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * This test verifies whether synchronized product data is visible on the products page.
 * This test does not validate every database record against the UI.
 * Direct database count or record validation should be covered by a separate SQL/data consistency test.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.
 
 ---
 
@@ -207,7 +207,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * This test verifies keyword search on the products page.
 * Search is expected to work across product title, brand and category.
 * This test does not validate every database record against the UI.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.
 * This test does not cover combined search and category filtering, which should be covered by a separate test case.
 
 ---
@@ -248,7 +248,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * This test verifies category filtering on the products page.
 * This test uses `smartphones` as a known category from the synchronized product data.
 * This test does not validate every database record against the UI.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.
 * This test does not cover combined search and category filtering, which should be covered by a separate test case.
 
 ---
@@ -296,7 +296,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * This test uses `samsung` as a known search term and `smartphones` as a known category from the synchronized product data.
 * This test checks whether both filters work together, not only separately.
 * This test does not validate every database record against the UI.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.
 
 ---
 
@@ -338,7 +338,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * This test uses `xyz-not-existing-123` as a search term that should not match synchronized product data.
 * If no empty-state message is displayed, this should be documented later as a UX observation or failed expectation, depending on the final behavior.
 * This test does not validate every database record against the UI.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.
 
 ---
 
@@ -388,4 +388,4 @@ FROM products;
 * The application uses `external_id` as the unique identifier for products from the external API.
 * The flash message may still show imported records after repeated synchronization because the route counts successful save/update operations, not only newly inserted records.
 * This test focuses on duplicate prevention and does not validate every product field against the external API.
-* This test does not validate visual styling because the UI is still basic and styling is planned.
+* This test focuses on functional behavior. Detailed visual regression is outside this test case.

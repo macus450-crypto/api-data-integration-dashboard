@@ -44,7 +44,6 @@ Repeated synchronization does not create duplicate products in the main scenario
 
 ## Not checked yet
 
-- empty search results
 - invalid category value
 - external API failure handling
 - database failure handling in UI

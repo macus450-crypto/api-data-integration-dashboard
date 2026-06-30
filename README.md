@@ -384,7 +384,7 @@ QA files are available in [`docs/qa`](docs/qa):
 
 All manual test cases from TC-001 to TC-010 passed in the tested local environment.
 
-> Note: some QA notes were written before the final UI styling pass, so UI-specific observations may refer to an earlier version. The functional test results are still relevant.
+> Note: QA evidence includes some historical screenshots from before the `/sync` POST and flash-message update. The current behavior is documented in the test cases and should be refreshed with new screenshots in the next QA evidence pass.
 
 ## Current Limitations
 
@@ -395,7 +395,7 @@ All manual test cases from TC-001 to TC-010 passed in the tested local environme
 - There are no charts yet.
 - There are no automated tests yet.
 - There is no authentication.
-- Some documentation files still need a final pass after the UI styling update.
+- Some QA evidence screenshots still need to be refreshed after the `/sync` POST and flash-message update.
 
 ## Roadmap
 
@@ -403,7 +403,7 @@ All manual test cases from TC-001 to TC-010 passed in the tested local environme
 
 - Add pagination and sorting to the product list.
 - Add automated tests for product normalization and database helper functions.
-- Refresh architecture and QA notes after the `/sync` POST and flash-message update.
+- Refresh QA evidence screenshots for the current `/sync` POST and flash-message flow.
 
 ### Later
 

@@ -17,7 +17,9 @@ The goal is to record what was tested, what the actual result was, whether the t
 
 ## Update note - 2026-06-30
 
-The `/sync` flow was updated after the original QA execution. Synchronization is now triggered from the dashboard **Run sync** button with a POST request, then redirects back to the dashboard and displays a flash message. The manual test cases have been updated to describe the current expected behavior. Historical screenshots from 2026-06-21 may still show the earlier JSON response flow until evidence is refreshed.
+The `/sync` flow was updated after the original QA execution. Synchronization is now triggered from the dashboard **Run sync** button with a POST request, then redirects back to the dashboard and displays a flash message. The manual test cases have been updated to describe the current expected behavior.
+
+Historical screenshots from 2026-06-21 are kept as historical evidence only. In particular, `docs/qa/evidence/screenshots/tc-003-sync.png` still shows the earlier direct `/sync` JSON response and should be refreshed in the next QA evidence pass.
 
 ## Status legend
 
@@ -32,7 +34,7 @@ The `/sync` flow was updated after the original QA execution. Synchronization is
 | ------- | ----------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | TC-001  | Database connection check                                   | PASS    | `docs/qa/evidence/screenshots/tc-001-db-test.png`                                                                                |
 | TC-002  | External API preview returns normalized products            | PASS    | `docs/qa/evidence/screenshots/tc-002-sync-preview.png`                                                                           |
-| TC-003  | Manual product synchronization                              | PASS    | `docs/qa/evidence/screenshots/tc-003-sync.png`                                                                                   |
+| TC-003  | Manual product synchronization                              | PASS    | Historical: `docs/qa/evidence/screenshots/tc-003-sync.png` shows the earlier JSON flow; current POST/flash evidence needs refresh |
 | TC-004  | Dashboard displays product statistics after synchronization | PASS    | `docs/qa/evidence/screenshots/tc-004-dashboard-stats.png`                                                                        |
 | TC-005  | Products page displays product records                      | PASS    | `docs/qa/evidence/screenshots/tc-005-products-page.png`                                                                          |
 | TC-006  | Product search by keyword                                   | PASS    | `docs/qa/evidence/screenshots/tc-006-search-phone.png`                                                                           |
@@ -91,7 +93,9 @@ This confirms that the manual synchronization flow can fetch product data, norma
 
 **Evidence:**
 
-`docs/qa/evidence/screenshots/tc-003-sync.png`
+Historical evidence: `docs/qa/evidence/screenshots/tc-003-sync.png`
+
+Note: this screenshot shows the earlier direct `/sync` JSON response. It should be replaced with a screenshot of the current dashboard POST -> flash -> redirect flow during the next QA evidence refresh.
 
 ---
 
