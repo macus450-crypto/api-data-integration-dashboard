@@ -27,6 +27,23 @@
         </header>
 
         <main class="container page-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flashes">
+                    {% for category, message in messages %}
+                        {% set notice_class = {
+                            'error': 'notice-error',
+                            'warning': 'notice-warning',
+                            'success': 'notice-success'
+                        }.get(category, '') %}
+
+                        <div class="notice {{ notice_class }}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
             {% block content %}{% endblock %}
         </main>
 

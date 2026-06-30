@@ -157,7 +157,7 @@ This makes the synchronization process visible instead of hiding it inside the b
 |---|---:|---|
 | `/` | GET | Dashboard with product statistics and latest sync information. |
 | `/products` | GET | Product table with optional search and category filtering. |
-| `/sync` | GET | Runs product synchronization and returns a JSON result. |
+| `/sync` | POST | Runs product synchronization from the dashboard, writes a sync log, flashes the result message, and redirects back to `/`. |
 | `/sync-preview` | GET | Fetches and normalizes API data without saving it. |
 | `/db-test` | GET | Checks the PostgreSQL connection. |
 
@@ -168,8 +168,6 @@ Example product filters:
 /products?category=smartphones
 /products?search=phone&category=mobile-accessories
 ```
-
-> Note: `/sync` currently uses GET for local development convenience. Before deployment, this action should be changed to POST and followed by a redirect or a user-friendly result page.
 
 ## Database Schema
 
@@ -319,24 +317,21 @@ Basic local test flow:
 ```http
 GET /db-test
 GET /sync-preview
-GET /sync
 GET /
+POST /sync via the dashboard "Run sync" button
 GET /products
 GET /products?search=phone
 GET /products?category=smartphones
 ```
 
-Example successful sync response:
+After clicking **Run sync**, the application redirects back to the dashboard and shows a flash message with the synchronization result. The latest synchronization panel should also update from the newest `sync_logs` entry.
 
-```json
-{
-    "success": true,
-    "status": "success",
-    "message": "Products synchronized successfully",
-    "records_imported": 194,
-    "records_not_imported": 0
-}
-```
+Expected successful sync behavior:
+
+- the browser stays in the dashboard flow instead of showing raw JSON,
+- a success flash message appears above the dashboard content,
+- the message includes the number of imported or updated records,
+- the latest synchronization section shows status, message, records imported, and timestamp.
 
 Useful SQL checks:
 
@@ -395,8 +390,7 @@ All manual test cases from TC-001 to TC-010 passed in the tested local environme
 
 - The application runs locally and is not deployed yet.
 - Synchronization is triggered manually.
-- `/sync` uses GET and returns JSON; it should use POST before deployment.
-- The dashboard "Run sync" action currently opens a JSON response instead of redirecting back to the dashboard.
+- `/sync` is triggered through a POST form and redirects back to the dashboard with a flash message.
 - The product list does not include pagination or sorting yet.
 - There are no charts yet.
 - There are no automated tests yet.
@@ -407,11 +401,9 @@ All manual test cases from TC-001 to TC-010 passed in the tested local environme
 
 ### Next
 
-- Change `/sync` from GET to POST.
-- Redirect back to the dashboard after synchronization or show a user-friendly sync result page.
 - Add pagination and sorting to the product list.
 - Add automated tests for product normalization and database helper functions.
-- Refresh architecture and QA notes after the UI styling update.
+- Refresh architecture and QA notes after the `/sync` POST and flash-message update.
 
 ### Later
 

@@ -55,7 +55,7 @@ Main routes:
 * `/` — displays dashboard statistics and last synchronization status.
 * `/products` — displays product list with search and category filtering.
 * `/sync-preview` — fetches product data from the external API and returns a preview without saving to the database.
-* `/sync` — fetches products, saves them to PostgreSQL, writes a synchronization log, and returns a JSON response.
+* `/sync` — handles the dashboard POST action, fetches products, saves them to PostgreSQL, writes a synchronization log, flashes the result message, and redirects back to the dashboard.
 * `/db-test` — checks database connection.
 
 `app.py` coordinates the flow between API client logic, database functions, and templates. It should not contain low-level SQL details or raw external API parsing logic.
@@ -389,57 +389,46 @@ The `/sync` route is responsible for importing products into the database.
 The flow is:
 
 ```text
-1. User opens /sync.
-2. Flask calls fetch_products().
-3. fetch_products() returns success status, products and message.
-4. If API fetching fails, an error sync log is saved.
-5. If no products are returned, an error sync log is saved.
-6. If products exist, each product is passed to save_product().
-7. The application counts imported and not imported products.
-8. A sync log is saved with success or partial_success status.
-9. JSON response is returned to the user.
+1. User clicks the dashboard "Run sync" button.
+2. The dashboard form sends a POST request to /sync.
+3. Flask calls fetch_products().
+4. fetch_products() returns success status, products and message.
+5. If API fetching fails, an error sync log is saved.
+6. If no products are returned, an error sync log is saved.
+7. If products exist, each product is passed to save_product().
+8. The application counts imported and not imported products.
+9. A sync log is saved with success or partial_success status.
+10. A flash message is prepared with success, warning, or error category.
+11. Flask redirects the user back to the dashboard.
+12. The dashboard displays the flash message and the latest synchronization status.
 ```
 
-Successful response example:
+Successful dashboard result example:
 
-```json
-{
-  "success": true,
-  "status": "success",
-  "message": "Products synchronized successfully",
-  "records_imported": 194,
-  "records_not_imported": 0
-}
+```text
+Flash category: success
+Message: Products synchronized successfully. Imported: 194
 ```
 
-Partial success response example:
+Partial success dashboard result example:
 
-```json
-{
-  "success": true,
-  "status": "partial_success",
-  "message": "Products synchronized with some errors. Imported: 190, Not Imported: 4",
-  "records_imported": 190,
-  "records_not_imported": 4
-}
+```text
+Flash category: warning
+Message: Products synchronized with some errors. Imported: 190, Not Imported: 4
 ```
 
-Error response example:
+Error dashboard result example:
 
-```json
-{
-  "success": false,
-  "status": "error",
-  "message": "Error while fetching products: ...",
-  "records_imported": 0
-}
+```text
+Flash category: error
+Message: Error while fetching products: ...
 ```
 
 Current behavior note:
 
 ```text
-/sync currently uses GET and returns JSON.
-For deployment, it should be changed to POST and should either redirect back to the dashboard or show a user-friendly sync result page.
+/sync uses POST because synchronization changes database state.
+After synchronization, the route redirects back to the dashboard and shows a flash message.
 ```
 
 ---
@@ -461,7 +450,7 @@ Handled cases include:
 
 The application does not crash immediately when a single product cannot be saved.
 
-Instead, it counts failed saves and can return a `partial_success` status.
+Instead, it counts failed saves, writes a `partial_success` sync log, and shows a warning flash message.
 
 This makes the synchronization process more transparent.
 
@@ -557,9 +546,7 @@ This is an MVP version of the project, so some features are intentionally limite
 Current limitations:
 
 * The application runs locally.
-* Synchronization is triggered manually through `/sync`.
-* `/sync` currently uses GET and returns JSON; it should use POST before deployment.
-* The dashboard "Run sync" action currently opens a JSON response instead of redirecting back to the dashboard.
+* Synchronization is triggered manually through the dashboard "Run sync" POST form.
 * There is no user authentication.
 * The UI is styled, but still intentionally simple and server-rendered.
 * There is no pagination for large product lists yet.
@@ -577,8 +564,6 @@ These limitations are acceptable for the current project scope because the goal 
 
 Possible future improvements:
 
-* Change `/sync` from GET to POST.
-* Redirect back to the dashboard after synchronization or show a user-friendly sync result page.
 * Add pagination to the product list.
 * Add sorting by price, rating, or stock.
 * Store detailed error logs for failed product saves.

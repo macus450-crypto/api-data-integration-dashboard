@@ -17,7 +17,7 @@ PostgreSQL connection works locally.
 External API fetch and product normalization work. The endpoint returns `products_count: 194` and sample normalized product records.
 
 ### /sync - PASS
-Products are synchronized successfully. The endpoint returns `success: true` and `records_imported: 194`.
+Products are synchronized successfully through the dashboard **Run sync** button. The `/sync` route is triggered with POST, redirects back to the dashboard, and shows a flash message with the synchronization result.
 
 ### / - PASS
 Dashboard loads successfully and displays:

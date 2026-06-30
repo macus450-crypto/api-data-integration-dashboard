@@ -15,7 +15,9 @@
 
     <div class="intro-actions" aria-label="Dashboard actions">
         <a href="/products" class="button button-primary">Browse products</a>
-        <a href="/sync" class="button button-secondary">Run sync</a>
+        <form action="/sync" method="post">
+            <button type="submit" class="button button-secondary">Run sync</button>
+        </form>
     </div>
 </section>
 

@@ -33,23 +33,23 @@ No critical functional bugs were found during this QA pass.
 
 ## Observations and limitations
 
-### OBS-001 - `/sync` uses GET while changing database state
+### OBS-001 - `/sync` state-changing action uses POST
 
-**Type:** Technical observation / design risk  
-**Severity:** Medium  
-**Priority:** Medium
+**Type:** Resolved technical observation  
+**Severity:** Resolved  
+**Priority:** Resolved
 
 **Description:**
 
-The `/sync` endpoint is triggered with a GET request, but it changes application state by fetching products from the external API, saving or updating records in PostgreSQL and creating a synchronization log.
+The `/sync` action changes application state by fetching products from the external API, saving or updating records in PostgreSQL and creating a synchronization log. This flow is now triggered by a POST form from the dashboard **Run sync** button.
 
 **Why it matters:**
 
-GET requests are generally expected to be safe and read-only. Using GET for an operation that changes database state may cause accidental synchronization, for example through browser refresh, link preview, crawler, monitoring tool or accidental page visit.
+POST is more appropriate for actions that change database state. It reduces the risk of accidental synchronization through direct page visits, browser refreshes, link previews, crawlers or monitoring tools.
 
-**Recommendation:**
+**Current status:**
 
-Change `/sync` from GET to POST before deployment or production-like use. The UI should trigger synchronization through a form or button that sends a POST request.
+Resolved. `/sync` uses POST, redirects back to the dashboard, and shows the result through a flash message.
 
 ---
 
@@ -176,7 +176,7 @@ Document setup steps clearly in the README and consider adding Docker support in
 ## Positive findings
 
 * Main MVP flow works in the tested local environment.
-* Product synchronization returns successful responses.
+* Product synchronization runs through a dashboard POST flow and shows a flash message result.
 * Dashboard displays product statistics and latest synchronization data.
 * Products page displays synchronized records from PostgreSQL.
 * Keyword search works.
@@ -194,7 +194,7 @@ The main data integration flow works as expected: products can be fetched from t
 
 No critical functional bugs were found during this QA pass.
 
-The most important improvements for the next iteration are changing `/sync` from GET to POST, adding automated tests, improving UI styling and adding pagination or sorting for the products table.
+The most important improvements for the next iteration are adding automated tests, improving the products table with pagination or sorting, and refreshing QA evidence screenshots after the `/sync` POST and flash-message update.
 
 ## Test coverage reference
 

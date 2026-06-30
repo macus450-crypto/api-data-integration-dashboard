@@ -80,26 +80,28 @@ Actual results, execution statuses and evidence from the completed manual test r
 
 **Steps:**
 
-1. Open `http://127.0.0.1:5000/sync` in the browser.
-2. Check the JSON response.
-3. Verify that the response contains `success`, `message` and `records_imported`.
-4. Open `http://127.0.0.1:5000/`.
-5. Verify that the dashboard displays latest synchronization information.
+1. Open `http://127.0.0.1:5000/` in the browser.
+2. Click the **Run sync** button.
+3. Verify that the browser returns to the dashboard after the POST request.
+4. Verify that a success flash message is displayed above the dashboard content.
+5. Verify that the flash message includes the number of imported or updated records.
+6. Verify that the dashboard displays latest synchronization information.
 
 **Expected result:**
 
-* Endpoint returns a successful response.
-* Response contains `success: true`.
-* Response contains a synchronization success message.
-* Response contains `records_imported`.
+* The synchronization action completes without a server error.
+* The user is redirected back to the dashboard.
+* A success flash message is visible.
+* The flash message contains a synchronization success message and imported records count.
 * Products are saved or updated in PostgreSQL.
-* Dashboard displays latest synchronization status after running `/sync`.
+* Dashboard displays latest synchronization status after clicking **Run sync**.
 
 **Notes:**
 
 * This test verifies the main manual synchronization flow.
 * Duplicate prevention after repeated synchronization should be covered by a separate test case.
-* `/sync` currently uses the GET method while changing database state. This is acceptable for local MVP testing, but should be reviewed before deployment.
+* `/sync` uses POST because synchronization changes database state.
+* This test verifies the user-facing dashboard flow, not a raw JSON API response.
 
 ---
 
@@ -110,7 +112,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
-* Products have been synchronized by running `/sync`.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
@@ -142,7 +144,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
-* Products have been synchronized by running `/sync`.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
@@ -176,7 +178,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
-* Products have been synchronized by running `/sync`.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
@@ -217,7 +219,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
-* Products have been synchronized by running `/sync`.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
@@ -258,7 +260,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
-* Products have been synchronized by running `/sync`.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
@@ -305,7 +307,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Application is running locally.
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
-* Products have been synchronized by running `/sync`.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
@@ -349,16 +351,17 @@ Actual results, execution statuses and evidence from the completed manual test r
 * PostgreSQL is installed and running.
 * `.env` file contains valid database connection settings.
 * Database schema has been created.
-* Products have been synchronized at least once by running `/sync`.
+* Products have been synchronized at least once by clicking **Run sync** on the dashboard.
 
 **Steps:**
 
-1. Open `http://127.0.0.1:5000/sync` in the browser.
-2. Check that the synchronization response is successful.
-3. Open `http://127.0.0.1:5000/sync` again.
-4. Check that the second synchronization response is successful.
-5. Verify the product count on the dashboard.
-6. Verify product count and unique `external_id` count directly in PostgreSQL using:
+1. Open `http://127.0.0.1:5000/` in the browser.
+2. Click the **Run sync** button.
+3. Check that the dashboard shows a successful synchronization flash message.
+4. Click the **Run sync** button again.
+5. Check that the dashboard shows a successful synchronization flash message again.
+6. Verify the product count on the dashboard.
+7. Verify product count and unique `external_id` count directly in PostgreSQL using:
 
 ```sql
 SELECT COUNT(*) AS total_products FROM products;
@@ -367,11 +370,12 @@ SELECT COUNT(DISTINCT external_id) AS unique_external_ids
 FROM products;
 ```
 
-7. Compare the total product count with the number of unique `external_id` values.
+8. Compare the total product count with the number of unique `external_id` values.
 
 **Expected result:**
 
-* Both synchronization attempts return a successful response.
+* Both synchronization attempts complete through the dashboard POST flow.
+* Both attempts show a successful flash message.
 * Dashboard product count remains stable after repeated synchronization.
 * Total product count in the database does not increase unexpectedly after repeated synchronization.
 * Each product is represented by a unique `external_id`.
@@ -382,6 +386,6 @@ FROM products;
 
 * This test verifies whether repeated synchronization updates existing products instead of creating duplicates.
 * The application uses `external_id` as the unique identifier for products from the external API.
-* `records_imported` may still be returned after repeated synchronization because the endpoint counts successful save/update operations, not only newly inserted records.
+* The flash message may still show imported records after repeated synchronization because the route counts successful save/update operations, not only newly inserted records.
 * This test focuses on duplicate prevention and does not validate every product field against the external API.
 * This test does not validate visual styling because the UI is still basic and styling is planned.

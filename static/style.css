@@ -284,6 +284,18 @@ h3 {
     background: var(--danger-soft);
 }
 
+.notice-success {
+    color: #047857;
+    border-color: #a7f3d0;
+    background: #ecfdf5;
+}
+
+.notice-warning {
+    color: #92400e;
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

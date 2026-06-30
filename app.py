@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 from database.db import test_connection, save_product, save_sync_log, get_dashboard_stats, get_products, get_categories
 from services.api_client import fetch_products
 
 app = Flask(__name__)
+app.secret_key = "dev-secret-key"
 
 
 @app.route("/")
@@ -43,38 +44,32 @@ def sync_preview():
         "sample_products": products[:5]
     }
 
-@app.route("/sync")
+@app.route("/sync", methods=["POST"])
 def sync_products():
     fetch_result = fetch_products()
     
     if fetch_result["success"] == False:
+        message = fetch_result.get("message")
         save_sync_log(
             "error",
-            fetch_result.get("message"),
+            message,
             0
         )
-        return {
-            "success": False,
-            "status": "error",
-            "message": fetch_result.get("message"),
-            "records_imported": 0
-        }, 500
-        
+        flash(message, "error")
+        return redirect(url_for("index"))
 
     products = fetch_result.get("products", [])
 
     if not products:
+        message = "No products fetched from external API"
         save_sync_log(
             "error",
-            "No products fetched from external API",
+            message,
             0
         )
-        return {
-            "success": False,
-            "status": "error",
-            "message": "No products fetched from external API",
-            "records_imported": 0
-        }, 500
+        flash(message, "error")
+        return redirect(url_for("index"))
+        
     
     imported_count = 0
     not_imported_count = 0
@@ -87,31 +82,25 @@ def sync_products():
             not_imported_count += 1
     
     if not_imported_count == 0:
+        message = f"Products synchronized successfully. Imported: {imported_count}"
         save_sync_log(
             "success",
-            "Products synchronized successfully",
+            message,
             imported_count
         )
-        return {
-            "success": True,
-            "status": "success",
-            "message": "Products synchronized successfully",
-            "records_imported": imported_count,
-            "records_not_imported": not_imported_count
-        }
+        flash(message, "success")
+        return redirect(url_for("index"))
     else:
+        message = f"Products synchronized with some errors. Imported: {imported_count}, Not Imported: {not_imported_count}"
         save_sync_log(
             "partial_success",
-            f"Products synchronized with some errors. Imported: {imported_count}, Not Imported: {not_imported_count}",
+            message,
             imported_count,
         )
-        return {
-            "success": True,
-            "status": "partial_success",
-            "message": f"Products synchronized with some errors. Imported: {imported_count}, Not Imported: {not_imported_count}",
-            "records_imported": imported_count,
-            "records_not_imported": not_imported_count
-        }
+        flash(message, "warning")
+        return redirect(url_for("index"))
+        
+    
 
 @app.route("/products")
 def products():

@@ -8,7 +8,7 @@ This document describes the current testable state of the API Data Integration D
 
 * `/db-test` endpoint for checking the local PostgreSQL connection
 * `/sync-preview` endpoint for fetching and previewing normalized product data without saving it to the database
-* `/sync` endpoint for manually synchronizing products from the external API into PostgreSQL
+* `/sync` POST route for manually synchronizing products from the external API into PostgreSQL through the dashboard form
 * Product normalization from the external API response
 * Product saving/updating in PostgreSQL using `external_id`
 * Synchronization logging with status, message, imported records count and timestamp
@@ -41,8 +41,8 @@ This document describes the current testable state of the API Data Integration D
 
 * The application depends on the external DummyJSON API, so synchronization results may be affected if the API is unavailable or changes its response structure.
 * The project requires a correctly configured local PostgreSQL database.
-* `/sync` uses the GET method while changing database state. This is acceptable for local MVP testing, but should be changed to POST before deployment.
-* Some error states may not be clearly visible in the UI yet.
+* The synchronization flow depends on a POST form, redirect, and flash message display, so this UI flow should be regression-tested after route or template changes.
+* Some deeper error states, such as external API failure or database write failure, still need targeted manual validation.
 * There are no automated tests yet, so regression testing currently depends on manual checks.
 
 ## Notes for next QA pass

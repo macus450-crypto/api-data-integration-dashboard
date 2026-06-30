@@ -12,7 +12,7 @@ This QA pass covers the following areas:
 
 * PostgreSQL connection check through `/db-test`
 * External API preview through `/sync-preview`
-* Manual product synchronization through `/sync`
+* Manual product synchronization through the dashboard **Run sync** POST form
 * Product data normalization
 * Product saving/updating in PostgreSQL
 * Synchronization logging
@@ -49,8 +49,8 @@ The main risks for this QA pass are:
 
 * The application depends on the external DummyJSON API.
 * The project requires a correctly configured local PostgreSQL database.
-* `/sync` uses the GET method while changing database state.
-* Error states may not be clearly visible in the UI yet.
+* The synchronization flow depends on the `/sync` POST action, redirect back to the dashboard, and flash message display.
+* External API or database error states may need targeted checks beyond the happy path.
 * Product list UI is functional but still unstyled.
 * There are no automated regression tests yet.
 * Repeated manual checks may be needed after changes because the project has no test automation at this stage.
@@ -61,7 +61,8 @@ Testing will be performed manually in a local environment.
 
 The main approach includes:
 
-* Opening selected endpoints in the browser
+* Opening selected read-only endpoints in the browser
+* Triggering synchronization from the dashboard **Run sync** button
 * Checking HTTP responses where applicable
 * Verifying dashboard values after synchronization
 * Checking whether products are displayed from the database

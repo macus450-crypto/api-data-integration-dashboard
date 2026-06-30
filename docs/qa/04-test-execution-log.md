@@ -15,6 +15,10 @@ The goal is to record what was tested, what the actual result was, whether the t
 * Browser: Chrome/Edge
 * Test date: 2026-06-21
 
+## Update note - 2026-06-30
+
+The `/sync` flow was updated after the original QA execution. Synchronization is now triggered from the dashboard **Run sync** button with a POST request, then redirects back to the dashboard and displays a flash message. The manual test cases have been updated to describe the current expected behavior. Historical screenshots from 2026-06-21 may still show the earlier JSON response flow until evidence is refreshed.
+
 ## Status legend
 
 * PASS - actual result matches the expected result.
@@ -79,9 +83,9 @@ This test verified API fetch and product normalization preview only. Database sa
 
 **Actual result:**
 
-The `/sync` endpoint returned a successful synchronization response. The response included `success: true`, `message: Products synchronized successfully` and `records_imported: 194`.
+The original 2026-06-21 run verified the earlier direct `/sync` response flow. After the 2026-06-30 update, the current expected behavior is that the dashboard **Run sync** button sends a POST request, returns the user to the dashboard, and displays a success flash message with the imported records count.
 
-After synchronization, the dashboard was opened and latest synchronization information was visible. The dashboard displayed synchronization status `success`, message `Products synchronized successfully`, `records_imported: 194` and synchronization date.
+After synchronization, the dashboard should display latest synchronization information. The dashboard should show synchronization status `success`, the sync message, imported records count and synchronization date.
 
 This confirms that the manual synchronization flow can fetch product data, normalize it, save or update it in PostgreSQL and display latest synchronization information on the dashboard.
 
@@ -197,7 +201,7 @@ After clicking `Clear`, the active search filter was removed and the unfiltered 
 
 **Actual result:**
 
-The `/sync` endpoint was executed repeatedly and returned a successful synchronization response. The response confirmed that products were synchronized successfully.
+The original 2026-06-21 run executed `/sync` repeatedly and verified duplicate prevention. After the 2026-06-30 update, repeated synchronization should be executed through the dashboard **Run sync** POST flow and should show a successful flash message after each attempt.
 
 After repeated synchronization, the dashboard product count remained stable at `194`.
 
