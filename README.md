@@ -19,7 +19,7 @@ DummyJSON Products API
 → Flask/Jinja2 dashboard
 ```
 
-The project currently supports manual synchronization, duplicate prevention, product search, category filtering, dashboard statistics, styled HTML views, and documented manual QA checks.
+The project currently supports manual synchronization, duplicate prevention, product search, category filtering, product thumbnails, dashboard statistics, styled HTML views, and documented manual QA checks.
 
 ## Screenshots
 
@@ -45,6 +45,7 @@ The project currently supports manual synchronization, duplicate prevention, pro
   - low-stock product count.
 - Displays last synchronization status and timestamp.
 - Provides a product list with search and category filtering.
+- Displays product thumbnails from the stored `thumbnail_url` value, with a fallback when an image is missing.
 - Uses shared Jinja2 templates and custom CSS styling.
 - Includes manual QA documentation for the main MVP flow.
 
@@ -151,12 +152,18 @@ Supported statuses:
 
 This makes the synchronization process visible instead of hiding it inside the backend.
 
+### 5. Product catalog rendering
+
+The `/products` page reads saved product records from PostgreSQL and renders them through a Jinja2 table.
+
+For each product, the table now uses the stored `thumbnail_url` value to show a small product image. If a product does not have a thumbnail, the UI shows a compact fallback marker instead of leaving the row visually broken.
+
 ## Routes
 
 | Route | Method | Description |
 |---|---:|---|
 | `/` | GET | Dashboard with product statistics and latest sync information. |
-| `/products` | GET | Product table with optional search and category filtering. |
+| `/products` | GET | Product table with thumbnails, optional search, and category filtering. |
 | `/sync` | POST | Runs product synchronization from the dashboard, writes a sync log, flashes the result message, and redirects back to `/`. |
 | `/sync-preview` | GET | Fetches and normalizes API data without saving it. |
 | `/db-test` | GET | Checks the PostgreSQL connection. |
@@ -333,6 +340,12 @@ Expected successful sync behavior:
 - the message includes the number of imported or updated records,
 - the latest synchronization section shows status, message, records imported, and timestamp.
 
+Expected product catalog behavior:
+
+- product rows show a thumbnail when `thumbnail_url` is available,
+- rows without a thumbnail show a small fallback marker,
+- search and category filters still work with the thumbnail column visible.
+
 Useful SQL checks:
 
 ```sql
@@ -423,6 +436,7 @@ This project helped me practice a full backend data flow instead of isolated Fla
 - using `external_id` and upsert logic to prevent duplicate records,
 - writing SQL queries for filtering, grouping, and dashboard statistics,
 - logging synchronization results to make imports easier to verify,
+- rendering stored image URLs safely in a server-rendered product table,
 - rendering database data through Jinja2 templates.
 
 The most useful part was connecting these pieces into one flow: API client → database layer → Flask route → dashboard.
