@@ -80,7 +80,24 @@
                 <tbody>
                     {% for product in products %}
                         <tr>
-                            <td class="product-name">{{ product.title }}</td>
+                            <td>
+                                <div class="product-cell">
+                                    {% if product.thumbnail_url %}
+                                        <img
+                                            class="product-thumbnail"
+                                            src="{{ product.thumbnail_url }}"
+                                            alt="{{ product.title }} thumbnail"
+                                            loading="lazy"
+                                        >
+                                    {% else %}
+                                        <span class="product-thumbnail product-thumbnail-empty" aria-hidden="true">
+                                            {{ product.title[:1] }}
+                                        </span>
+                                    {% endif %}
+
+                                    <span class="product-name">{{ product.title }}</span>
+                                </div>
+                            </td>
                             <td>{{ product.brand or "Unknown" }}</td>
                             <td>
                                 <span class="category-label">{{ product.category or "uncategorized" }}</span>

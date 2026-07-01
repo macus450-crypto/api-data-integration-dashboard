@@ -264,7 +264,7 @@ def get_products(search=None, category=None):
         parameters = []
 
         query = """
-            SELECT title, brand, category, price, discount_percentage, rating, stock
+            SELECT title, brand, category, price, discount_percentage, rating, stock, thumbnail_url
             FROM products
         """
 
@@ -299,7 +299,8 @@ def get_products(search=None, category=None):
                 "price": row[3],
                 "discount_percentage": row[4],
                 "rating": row[5],
-                "stock": row[6]
+                "stock": row[6],
+                "thumbnail_url": row[7],
             }
 
             products.append(product)

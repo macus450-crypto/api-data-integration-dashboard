@@ -566,6 +566,32 @@ select:focus-visible {
     background: #f9fafb;
 }
 
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+}
+
+.product-thumbnail {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-subtle);
+    object-fit: contain;
+}
+
+.product-thumbnail-empty {
+    display: inline-grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
 .product-name {
     max-width: 340px;
     color: var(--ink);
