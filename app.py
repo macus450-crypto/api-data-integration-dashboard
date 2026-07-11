@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+from config import SECRET_KEY
 from database.db import (
     test_connection,
     save_product,
@@ -11,7 +12,8 @@ from database.db import (
 from services.api_client import fetch_products
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-key"
+app.secret_key = SECRET_KEY
+
 PRODUCTS_PER_PAGE = 20
 
 @app.route("/")

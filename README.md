@@ -299,7 +299,10 @@ DB_NAME=api_dashboard_db
 DB_USER=postgres
 DB_PASSWORD=your_password_here
 DB_PORT=5432
+SECRET_KEY=your_secret_key_here
 ```
+
+`SECRET_KEY` is required by Flask to sign session data and flash messages. Use a unique, private value in your local `.env` file and do not commit the real `.env` file to Git.
 
 ### 5. Create the database and run the schema
 
