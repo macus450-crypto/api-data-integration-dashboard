@@ -5,12 +5,14 @@ from database.db import (
     save_sync_log,
     get_dashboard_stats,
     get_products,
+    get_products_count,
     get_categories,
 )
 from services.api_client import fetch_products
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
+PRODUCTS_PER_PAGE = 20
 
 @app.route("/")
 def index():
@@ -108,10 +110,52 @@ def sync_products():
 def products():
     search = request.args.get("search")
     category = request.args.get("category")
+    page = request.args.get("page", 1, type=int)
 
     categories = get_categories()
-    products_list = get_products(search=search, category=category)
-    return render_template("products.html", products=products_list, search=search, category=category, categories=categories)
+    total_products = get_products_count(search=search, category=category)
+    total_pages = max((total_products + PRODUCTS_PER_PAGE - 1) // PRODUCTS_PER_PAGE, 1)
+
+    if page is None or page < 1:
+        page = 1
+
+    if page > total_pages:
+        page = total_pages
+
+    offset = (page - 1) * PRODUCTS_PER_PAGE
+    products_list = get_products(
+        search=search,
+        category=category,
+        limit=PRODUCTS_PER_PAGE,
+        offset=offset,
+    )
+
+    start_item = offset + 1 if total_products else 0
+    end_item = offset + len(products_list)
+
+    filter_args = {}
+    if search:
+        filter_args["search"] = search
+    if category:
+        filter_args["category"] = category
+
+    prev_url = url_for("products", page=page - 1, **filter_args) if page > 1 else None
+    next_url = url_for("products", page=page + 1, **filter_args) if page < total_pages else None
+
+    return render_template(
+        "products.html",
+        products=products_list,
+        search=search,
+        category=category,
+        categories=categories,
+        page=page,
+        total_pages=total_pages,
+        total_products=total_products,
+        start_item=start_item,
+        end_item=end_item,
+        prev_url=prev_url,
+        next_url=next_url,
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

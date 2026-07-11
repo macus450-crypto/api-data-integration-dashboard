@@ -252,38 +252,49 @@ def get_dashboard_stats():
             connection.close()
 
 
-def get_products(search=None, category=None):
+def _build_product_filters(search=None, category=None):
+    conditions = []
+    parameters = []
+
+    if search:
+        conditions.append("(title ILIKE %s OR brand ILIKE %s OR category ILIKE %s)")
+
+        search_value = f"%{search}%"
+
+        parameters.extend([search_value, search_value, search_value])
+
+    if category:
+        conditions.append("(category = %s)")
+
+        parameters.append(category)
+
+    return conditions, parameters
+
+
+def get_products(search=None, category=None, limit=None, offset=0):
     connection = None
     cursor = None
 
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        # conditions stores optional SQL filters based on user query parameters
-        conditions = []
-        parameters = []
+        conditions, parameters = _build_product_filters(search, category)
 
         query = """
             SELECT title, brand, category, price, discount_percentage, rating, stock, thumbnail_url
             FROM products
         """
 
-        if search:
-            conditions.append("(title ILIKE %s OR brand ILIKE %s OR category ILIKE %s)")
-            
-            search_value = f"%{search}%"
-            
-            parameters.extend([search_value, search_value, search_value])
-        
-        if category:
-            conditions.append("(category = %s)")
-            
-            parameters.append(category)
-
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
         
-        query += " ORDER BY title ASC;"
+        query += " ORDER BY title ASC"
+
+        if limit is not None:
+            query += " LIMIT %s OFFSET %s"
+            parameters.extend([limit, offset])
+
+        query += ";"
 
         cursor.execute(query, parameters)
 
@@ -312,6 +323,41 @@ def get_products(search=None, category=None):
     
         return []
         
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+def get_products_count(search=None, category=None):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        conditions, parameters = _build_product_filters(search, category)
+
+        query = """
+            SELECT COUNT(*)
+            FROM products
+        """
+
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+
+        query += ";"
+
+        cursor.execute(query, parameters)
+        row = cursor.fetchone()
+
+        return row[0]
+
+    except Exception as error:
+        print(f"Failed to get products count: {error}")
+
+        return 0
+
     finally:
         if cursor:
             cursor.close()

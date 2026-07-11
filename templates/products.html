@@ -59,7 +59,7 @@
         </div>
 
         <span class="result-count">
-            {{ products|length }} result{% if products|length != 1 %}s{% endif %}
+            {{ total_products }} result{% if total_products != 1 %}s{% endif %}
         </span>
     </div>
 
@@ -118,6 +118,27 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+        <div class="pagination-bar" aria-label="Product pagination">
+            <p class="pagination-summary">
+                Showing {{ start_item }}-{{ end_item }} of {{ total_products }} products.
+                Page {{ page }} of {{ total_pages }}.
+            </p>
+
+            <div class="pagination-actions">
+                {% if prev_url %}
+                    <a href="{{ prev_url }}" class="button button-text">Previous</a>
+                {% else %}
+                    <span class="button button-text pagination-disabled" aria-disabled="true">Previous</span>
+                {% endif %}
+
+                {% if next_url %}
+                    <a href="{{ next_url }}" class="button button-text">Next</a>
+                {% else %}
+                    <span class="button button-text pagination-disabled" aria-disabled="true">Next</span>
+                {% endif %}
+            </div>
         </div>
     {% else %}
         <div class="empty-state">

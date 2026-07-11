@@ -19,7 +19,7 @@ DummyJSON Products API
 → Flask/Jinja2 dashboard
 ```
 
-The project currently supports manual synchronization, duplicate prevention, product search, category filtering, product thumbnails, dashboard statistics, styled HTML views, and documented manual QA checks.
+The project currently supports manual synchronization, duplicate prevention, product search, category filtering, product thumbnails, paginated product browsing, dashboard statistics, styled HTML views, and documented manual QA checks.
 
 ## Screenshots
 
@@ -46,6 +46,7 @@ The project currently supports manual synchronization, duplicate prevention, pro
 - Displays last synchronization status and timestamp.
 - Provides a product list with search and category filtering.
 - Displays product thumbnails from the stored `thumbnail_url` value, with a fallback when an image is missing.
+- Paginates the product list so the catalog does not render every matching row at once.
 - Uses shared Jinja2 templates and custom CSS styling.
 - Includes manual QA documentation for the main MVP flow.
 
@@ -158,12 +159,14 @@ The `/products` page reads saved product records from PostgreSQL and renders the
 
 For each product, the table now uses the stored `thumbnail_url` value to show a small product image. If a product does not have a thumbnail, the UI shows a compact fallback marker instead of leaving the row visually broken.
 
+The product catalog is paginated. The route accepts a `page` query parameter, counts all matching records, and then fetches only one page of rows using SQL `LIMIT` and `OFFSET`.
+
 ## Routes
 
 | Route | Method | Description |
 |---|---:|---|
 | `/` | GET | Dashboard with product statistics and latest sync information. |
-| `/products` | GET | Product table with thumbnails, optional search, and category filtering. |
+| `/products` | GET | Paginated product table with thumbnails, optional search, and category filtering. |
 | `/sync` | POST | Runs product synchronization from the dashboard, writes a sync log, flashes the result message, and redirects back to `/`. |
 | `/sync-preview` | GET | Fetches and normalizes API data without saving it. |
 | `/db-test` | GET | Checks the PostgreSQL connection. |
@@ -174,6 +177,8 @@ Example product filters:
 /products?search=phone
 /products?category=smartphones
 /products?search=phone&category=mobile-accessories
+/products?page=2
+/products?search=phone&page=2
 ```
 
 ## Database Schema
@@ -327,6 +332,7 @@ GET /sync-preview
 GET /
 POST /sync via the dashboard "Run sync" button
 GET /products
+GET /products?page=2
 GET /products?search=phone
 GET /products?category=smartphones
 ```
@@ -344,6 +350,8 @@ Expected product catalog behavior:
 
 - product rows show a thumbnail when `thumbnail_url` is available,
 - rows without a thumbnail show a small fallback marker,
+- the page shows a limited number of products at once,
+- pagination controls preserve active search and category filters,
 - search and category filters still work with the thumbnail column visible.
 
 Useful SQL checks:
@@ -404,7 +412,7 @@ All manual test cases from TC-001 to TC-010 passed in the tested local environme
 - The application runs locally and is not deployed yet.
 - Synchronization is triggered manually.
 - `/sync` is triggered through a POST form and redirects back to the dashboard with a flash message.
-- The product list does not include pagination or sorting yet.
+- The product list does not include sorting yet.
 - There are no charts yet.
 - There are no automated tests yet.
 - There is no authentication.
@@ -414,7 +422,7 @@ All manual test cases from TC-001 to TC-010 passed in the tested local environme
 
 ### Next
 
-- Add pagination and sorting to the product list.
+- Add sorting to the product list.
 - Add automated tests for product normalization and database helper functions.
 - Refresh QA evidence screenshots for the current `/sync` POST and flash-message flow.
 
@@ -435,6 +443,7 @@ This project helped me practice a full backend data flow instead of isolated Fla
 - designing PostgreSQL tables for imported product data and sync logs,
 - using `external_id` and upsert logic to prevent duplicate records,
 - writing SQL queries for filtering, grouping, and dashboard statistics,
+- adding SQL pagination with `LIMIT`, `OFFSET`, and a matching `COUNT(*)` query,
 - logging synchronization results to make imports easier to verify,
 - rendering stored image URLs safely in a server-rendered product table,
 - rendering database data through Jinja2 templates.

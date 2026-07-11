@@ -598,6 +598,37 @@ select:focus-visible {
     font-weight: 760;
 }
 
+.pagination-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 22px 22px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.pagination-summary {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.pagination-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pagination-disabled {
+    color: var(--muted-light);
+    background: var(--surface-subtle);
+    cursor: not-allowed;
+    opacity: 0.68;
+    pointer-events: none;
+}
+
 .numeric-cell {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
