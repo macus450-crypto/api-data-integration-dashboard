@@ -17,18 +17,19 @@ This document describes the current testable state of the API Data Integration D
 * Product search by title, brand or category
 * Category filter populated from database categories
 * Combined search and category filtering
+* Product thumbnails in the product table
+* Product pagination using a `page` query parameter, matching product count, SQL `LIMIT` and `OFFSET`
 * Empty search result behavior with a clear `No products found` message
 * Styled dashboard and product list UI with custom CSS
 * Repeated synchronization without creating duplicate products in the main tested scenario
 
 ## Partially ready
 
-* Product list displays matching records, but pagination and sorting are not implemented yet.
+* Product list displays matching records, but sorting is not implemented yet.
 * UI styling is present, but future changes may still need visual regression checks and refreshed screenshots.
 
 ## Planned / not ready for testing
 
-* Pagination for the product list
 * Sorting for the product list
 * Charts for dashboard data
 * Automated tests

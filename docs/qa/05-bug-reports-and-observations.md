@@ -10,7 +10,7 @@ The goal is to document not only test failures, but also important quality-relat
 
 During this QA pass, the main MVP data integration flow was tested manually.
 
-The following areas were verified:
+The following areas were verified during the executed manual tests or reviewed after later updates:
 
 * database connection
 * external API preview
@@ -21,9 +21,10 @@ The following areas were verified:
 * category filtering
 * combined search and category filtering
 * empty search result behavior
+* product pagination implementation status
 * repeated synchronization and duplicate prevention
 
-All executed manual test cases passed in the tested local environment.
+All executed manual test cases passed in the tested local environment. Pagination was added after the original manual QA run, and TC-011 has now been executed with refreshed evidence.
 
 No critical functional bugs were found in the main MVP flow.
 
@@ -73,23 +74,23 @@ Resolved. Future UI work should focus on feature polish, visual regression check
 
 ---
 
-### OBS-003 - Product list has no pagination
+### OBS-003 - Product list pagination has been added
 
-**Type:** Functional limitation  
-**Severity:** Low  
-**Priority:** Medium
+**Type:** Resolved functional limitation
+**Severity:** Resolved
+**Priority:** Resolved
 
 **Description:**
 
-The products page displays many product records in a single table. Pagination is not implemented yet.
+The products page previously displayed many product records in a single table. Pagination has now been implemented with a `page` query parameter, a matching product count query, and SQL `LIMIT` / `OFFSET`.
 
 **Why it matters:**
 
-For a small dataset the current solution is acceptable, but with larger datasets the page may become harder to use and slower to load.
+Pagination keeps the product catalog easier to browse and prevents the page from rendering every matching row at once as the dataset grows.
 
-**Recommendation:**
+**Current status:**
 
-Add pagination to the products page before expanding the dataset or using the application with larger product collections.
+Resolved in the application code. Refreshed QA evidence has been collected for page 1, page 2 and filtered pagination. The out-of-range page case was verified with a local HTTP request.
 
 ---
 
@@ -179,6 +180,7 @@ Document setup steps clearly in the README and consider adding Docker support in
 * Product synchronization runs through a dashboard POST flow and shows a flash message result.
 * Dashboard displays product statistics and latest synchronization data.
 * Products page displays synchronized records from PostgreSQL.
+* Product pagination has been implemented for the catalog.
 * Keyword search works.
 * Category filtering works.
 * Combined search and category filtering works.
@@ -190,11 +192,11 @@ Document setup steps clearly in the README and consider adding Docker support in
 
 The API Data Integration Dashboard MVP is functional in the tested local environment.
 
-The main data integration flow works as expected: products can be fetched from the external API, normalized, synchronized into PostgreSQL, displayed on the dashboard and browsed through the products page with search and category filtering.
+The main data integration flow works as expected: products can be fetched from the external API, normalized, synchronized into PostgreSQL, displayed on the dashboard and browsed through the products page with search, category filtering and pagination.
 
 No critical functional bugs were found during this QA pass.
 
-The most important improvements for the next iteration are adding automated tests, improving the products table with pagination or sorting, and refreshing QA evidence screenshots after the `/sync` POST and flash-message update.
+The most important improvements for the next iteration are adding automated tests, adding sorting to the products table, and refreshing QA evidence screenshots after the `/sync` POST and flash-message update.
 
 ## Test coverage reference
 
@@ -212,5 +214,6 @@ The QA observations in this document are based on the manual test cases executed
 | TC-008  | Combined search and category filtering            | PASS   |
 | TC-009  | Empty search result behavior                      | PASS   |
 | TC-010  | Repeated synchronization and duplicate prevention | PASS   |
+| TC-011  | Product pagination behavior                       | PASS   |
 
 All listed test cases passed in the tested local environment. Detailed actual results and evidence are documented in `04-test-execution-log.md`.

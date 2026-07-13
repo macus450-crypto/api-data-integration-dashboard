@@ -394,6 +394,7 @@ The project includes a manual QA pass for the main MVP flow. The checks cover:
 - search,
 - category filtering,
 - combined search and filtering,
+- product pagination,
 - empty result behavior,
 - repeated synchronization and duplicate prevention.
 
@@ -406,9 +407,9 @@ QA files are available in [`docs/qa`](docs/qa):
 - [`04-test-execution-log.md`](docs/qa/04-test-execution-log.md)
 - [`05-bug-reports-and-observations.md`](docs/qa/05-bug-reports-and-observations.md)
 
-All manual test cases from TC-001 to TC-010 passed in the tested local environment.
+All manual test cases from TC-001 to TC-011 passed in the tested local environment.
 
-> Note: QA evidence includes some historical screenshots from before the `/sync` POST and flash-message update. The current behavior is documented in the test cases and should be refreshed with new screenshots in the next QA evidence pass.
+> Note: QA evidence includes refreshed pagination screenshots for TC-011. Some historical screenshots from before the `/sync` POST and flash-message update are still kept as historical evidence and should be refreshed in a later QA pass.
 
 ## Current Limitations
 

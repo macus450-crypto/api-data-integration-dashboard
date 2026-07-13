@@ -4,7 +4,7 @@
 
 The goal of this QA pass is to verify the main MVP data integration flow of the API Data Integration Dashboard project.
 
-The focus is on checking whether product data can be fetched from the external API, normalized, synchronized into PostgreSQL, displayed on the dashboard and browsed through the products page with basic search and category filtering.
+The focus is on checking whether product data can be fetched from the external API, normalized, synchronized into PostgreSQL, displayed on the dashboard and browsed through the products page with basic search, category filtering and pagination.
 
 ## Scope
 
@@ -22,6 +22,7 @@ This QA pass covers the following areas:
 * Product search by title, brand or category
 * Category filtering
 * Combined search and category filtering
+* Product pagination and pagination behavior with active filters
 * Repeated synchronization and duplicate prevention in the main tested scenario
 
 ## Out of scope
@@ -36,7 +37,6 @@ The following areas are not included in this QA pass:
 * Playwright tests
 * Docker setup
 * Scheduled synchronization
-* Pagination testing
 * Sorting testing
 * Charts testing
 * Authentication testing
@@ -67,6 +67,7 @@ The main approach includes:
 * Verifying dashboard values after synchronization
 * Checking whether products are displayed from the database
 * Testing search and category filtering behavior
+* Testing pagination by opening additional pages and checking boundary page values
 * Repeating synchronization to check whether duplicate products are created
 * Using selected PostgreSQL queries later to verify product count and synchronization logs
 * Documenting results in manual test cases, execution log and QA observations

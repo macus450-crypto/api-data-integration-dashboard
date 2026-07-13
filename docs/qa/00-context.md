@@ -29,6 +29,11 @@ Dashboard loads successfully and displays:
 
 ### /products - PASS
 Products page loads successfully and displays product records from the database.
+The current implementation displays product thumbnails and uses pagination for the catalog.
+
+### Pagination - PASS
+Product pagination works for the unfiltered catalog. Page 1 and page 2 display different record ranges, and filtered pagination works for `search=phone`.
+The out-of-range page case `/products?page=999` was checked with a local HTTP request and safely displayed the last available page.
 
 ### Search - PASS
 Search for `phone` returns filtered product results. The search value remains visible in the input field.
@@ -42,12 +47,11 @@ Search for `samsung` within the `smartphones` category returns Samsung smartphon
 ### Repeated sync - PASS
 Repeated synchronization does not create duplicate products in the main scenario. The dashboard product count remains 194 after another sync.
 
-## Not checked yet
+## Not checked yet / needs refreshed evidence
 
 - invalid category value
 - external API failure handling
 - database failure handling in UI
-- pagination
 - sorting
 - charts
 - automated tests

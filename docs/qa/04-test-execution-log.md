@@ -21,6 +21,10 @@ The `/sync` flow was updated after the original QA execution. Synchronization is
 
 Historical screenshots from 2026-06-21 are kept as historical evidence only. In particular, `docs/qa/evidence/screenshots/tc-003-sync.png` still shows the earlier direct `/sync` JSON response and should be refreshed in the next QA evidence pass.
 
+## Update note - 2026-07-13
+
+Product pagination was implemented after the original manual QA run. TC-011 was executed on 2026-07-13 with refreshed screenshots for page 1, page 2 and filtered pagination. The out-of-range page case was also checked with a local HTTP request.
+
 ## Status legend
 
 * PASS - actual result matches the expected result.
@@ -42,6 +46,7 @@ Historical screenshots from 2026-06-21 are kept as historical evidence only. In 
 | TC-008  | Combined search and category filtering                      | PASS    | `docs/qa/evidence/screenshots/tc-008-search-samsung-category-smartphones.png`                                                    |               
 | TC-009  | Empty search result behavior                                | PASS    | `docs/qa/evidence/screenshots/tc-009-empty-search-result.png`                                                                    |
 | TC-010  | Repeated synchronization does not create duplicate products | PASS    | See TC-010 execution details                                                                                                     |
+| TC-011  | Product pagination works and preserves filters              | PASS    | See TC-011 execution details                                                                                                     |
 
 
 
@@ -223,4 +228,30 @@ This confirms that repeated synchronization updates existing product records ins
 `docs/qa/evidence/screenshots/tc-010-sql-product-count.png`
 
 `docs/qa/evidence/db-queries/tc-010-product-count.sql`
+
+---
+
+### TC-011 - Product pagination works and preserves filters
+
+**Status:** PASS
+
+**Actual result:**
+
+The `/products` page displayed the first page of catalog results with the pagination summary `Showing 1-20 of 194 products. Page 1 of 10.` The `Previous` control was disabled and the `Next` link was available.
+
+The `/products?page=2` page displayed the next record range with the summary `Showing 21-40 of 194 products. Page 2 of 10.` Both `Previous` and `Next` links were available.
+
+The `/products?page=999` case returned HTTP `200` and safely displayed the last available page with the summary `Showing 181-194 of 194 products. Page 10 of 10.`
+
+The `/products?search=phone&page=1` filtered page kept the `phone` search value, displayed `20 results`, and showed `Page 1 of 1.` Because the filtered result set fit on one page, both pagination controls were disabled.
+
+**Evidence:**
+
+`docs/qa/evidence/screenshots/tc-011-products-page-1.png`
+
+`docs/qa/evidence/screenshots/tc-011-products-page-2.png`
+
+`docs/qa/evidence/screenshots/tc-011-products-filtered-pagination.png`
+
+Additional check: `/products?page=999` was verified with a local HTTP request and returned HTTP `200` with the last available page.
 

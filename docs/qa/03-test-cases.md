@@ -4,7 +4,7 @@
 
 This document contains manual test cases for the main MVP data integration flow of the API Data Integration Dashboard project.
 
-The test cases focus on local manual testing of implemented and testable features: database connection, external API preview, synchronization, dashboard, products page, search, category filtering and repeated synchronization.
+The test cases focus on local manual testing of implemented and testable features: database connection, external API preview, synchronization, dashboard, products page, search, category filtering, pagination and repeated synchronization.
 
 ## Execution note
 
@@ -161,6 +161,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 * Product records are visible in the table.
 * Product details are displayed in the expected columns.
 * Search input and category filter are visible on the page.
+* Pagination summary and pagination controls are visible when the matching dataset has more than one page.
 
 **Notes:**
 
@@ -184,7 +185,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 
 1. Open `http://127.0.0.1:5000/products` in the browser.
 2. Enter `phone` in the search input.
-3. Click the `Search` button.
+3. Click the `Apply` button.
 4. Check whether the product list is filtered.
 5. Verify that displayed products are related to the search keyword through title, brand or category.
 6. Verify that the search input keeps the value `phone`.
@@ -225,7 +226,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 
 1. Open `http://127.0.0.1:5000/products` in the browser.
 2. Select `smartphones` from the category filter.
-3. Click the `Search` button.
+3. Click the `Apply` button.
 4. Check whether the product list is filtered.
 5. Verify that displayed products belong to the `smartphones` category.
 6. Verify that the category dropdown keeps the selected value `smartphones`.
@@ -267,7 +268,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 1. Open `http://127.0.0.1:5000/products` in the browser.
 2. Enter `samsung` in the search input.
 3. Select `smartphones` from the category filter.
-4. Click the `Search` button.
+4. Click the `Apply` button.
 5. Check whether the product list is filtered.
 6. Verify that displayed products are related to the search keyword `samsung`.
 7. Verify that displayed products belong to the selected category `smartphones`.
@@ -313,7 +314,7 @@ Actual results, execution statuses and evidence from the completed manual test r
 
 1. Open `http://127.0.0.1:5000/products` in the browser.
 2. Enter `xyz-not-existing-123` in the search input.
-3. Click the `Search` button.
+3. Click the `Apply` button.
 4. Check whether the products page loads successfully after submitting the search.
 5. Verify that no unrelated product records are displayed.
 6. Verify whether a clear message indicating no matching products is displayed.
@@ -389,3 +390,44 @@ FROM products;
 * The flash message may still show imported records after repeated synchronization because the route counts successful save/update operations, not only newly inserted records.
 * This test focuses on duplicate prevention and does not validate every product field against the external API.
 * This test focuses on functional behavior. Detailed visual regression is outside this test case.
+
+---
+
+## TC-011 - Product pagination works and preserves filters
+
+**Preconditions:**
+
+* Application is running locally.
+* PostgreSQL is installed and running.
+* `.env` file contains valid database connection settings.
+* Products have been synchronized by clicking **Run sync** on the dashboard.
+* The synchronized dataset contains more records than one product page can display.
+
+**Steps:**
+
+1. Open `http://127.0.0.1:5000/products` in the browser.
+2. Verify that the first page displays a limited number of product records.
+3. Verify that the pagination summary shows the visible record range, total record count and current page.
+4. Click the `Next` pagination link.
+5. Verify that the browser opens page 2 and displays the next set of products.
+6. Click the `Previous` pagination link.
+7. Verify that the browser returns to page 1.
+8. Open `http://127.0.0.1:5000/products?page=999`.
+9. Verify that the application does not crash and displays the last available page.
+10. Open `http://127.0.0.1:5000/products?search=phone&page=1`.
+11. If more than one filtered page exists, click `Next`.
+12. Verify that the active search filter remains present in the URL and input field.
+
+**Expected result:**
+
+* Products page loads without a server error.
+* Only one page of product records is displayed at a time.
+* Pagination summary shows a clear record range and page number.
+* `Next` and `Previous` links navigate between available pages.
+* Out-of-range page values are handled safely by showing the last available page.
+* Pagination links preserve active search and category filters.
+
+**Notes:**
+
+* This test verifies the current pagination behavior added after the original manual QA pass.
+* This test should be executed during the next refreshed QA evidence pass.
