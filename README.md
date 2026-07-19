@@ -261,7 +261,7 @@ api-data-integration-dashboard/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/macus450-crypto/api-data-integration-dashboard.git
+git clone https://github.com/Macus77a/api-data-integration-dashboard.git
 cd api-data-integration-dashboard
 ```
 
